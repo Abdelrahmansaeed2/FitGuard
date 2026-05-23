@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitGuard.API", "FitGuard.API\FitGuard.API.csproj", "{455629C4-E677-4EAE-8D05-40D46D4E0B3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitGuard.Application", "FitGuard.Application\FitGuard.Application.csproj", "{725F6E54-B9CF-47BA-BEB4-1B4BBF56F671}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitGuard.Domain", "FitGuard.Domain\FitGuard.Domain.csproj", "{6B2CA1A3-8CE3-4431-BB00-B2B708E78BEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitGuard.Infrastructure", "FitGuard.Infrastructure\FitGuard.Infrastructure.csproj", "{339E8E98-FB2C-4D47-95C8-E06F60D2E9B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{455629C4-E677-4EAE-8D05-40D46D4E0B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{455629C4-E677-4EAE-8D05-40D46D4E0B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{455629C4-E677-4EAE-8D05-40D46D4E0B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{455629C4-E677-4EAE-8D05-40D46D4E0B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{725F6E54-B9CF-47BA-BEB4-1B4BBF56F671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{725F6E54-B9CF-47BA-BEB4-1B4BBF56F671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{725F6E54-B9CF-47BA-BEB4-1B4BBF56F671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{725F6E54-B9CF-47BA-BEB4-1B4BBF56F671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B2CA1A3-8CE3-4431-BB00-B2B708E78BEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B2CA1A3-8CE3-4431-BB00-B2B708E78BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B2CA1A3-8CE3-4431-BB00-B2B708E78BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B2CA1A3-8CE3-4431-BB00-B2B708E78BEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{339E8E98-FB2C-4D47-95C8-E06F60D2E9B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{339E8E98-FB2C-4D47-95C8-E06F60D2E9B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{339E8E98-FB2C-4D47-95C8-E06F60D2E9B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{339E8E98-FB2C-4D47-95C8-E06F60D2E9B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
