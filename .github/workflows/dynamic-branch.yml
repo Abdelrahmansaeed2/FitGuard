@@ -1,0 +1,97 @@
+
+name: Dynamic Issue Workflow
+
+
+
+on:
+
+  issues:
+
+    types: [assigned]
+
+
+
+permissions:
+
+  contents: write
+
+  issues: write
+
+
+
+jobs:
+
+  create_dynamic_branch:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+
+        uses: actions/checkout@v4
+
+        with:
+
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+      - name: Create Branch Dynamically based on Assignee
+
+        env:
+
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+
+          ASSIGNEE: ${{ github.event.assignee.login }}
+
+        run: |
+
+          # 1. Clean the issue title
+
+          CLEAN_TITLE=$(echo "$ISSUE_TITLE" | sed -e 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]' | sed -e 's/--+/-/g' -e 's/^-+|-+$//g')
+
+          
+
+          # 2. Construct the branch name
+
+          BRANCH_NAME="feature/issue-$ISSUE_NUMBER-$CLEAN_TITLE/$ASSIGNEE"
+
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+          
+
+          # 3. Configure git and push
+
+          git config --global user.name "github-actions[bot]"
+
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b $BRANCH_NAME
+
+          git push origin $BRANCH_NAME
+
+          
+
+      - name: Comment on Issue
+
+        uses: actions/github-script@v7
+
+        with:
+
+          script: |
+
+            github.rest.issues.createComment({
+
+              issue_number: context.issue.number,
+
+              owner: context.repo.owner,
+
+              repo: context.repo.repo,
+
+              body: `A new branch has been automatically created for this issue for developer @${context.payload.assignee.login}.\n\nBranch name: \`${process.env.BRANCH_NAME}\``
+
+            })
+
