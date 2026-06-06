@@ -1,23 +1,18 @@
-import { Bell, UserCircle } from 'lucide-react';
+import React from 'react';
 
 export default function Navbar() {
   return (
-    <header className="bg-white shadow-sm h-20 flex items-center justify-between px-8 z-10">
-      <h1 className="text-2xl font-semibold text-slate-800">
-        Welcome back, <span className="text-primary">Abd Elrahman</span> 👋
-      </h1>
-      
-      <div className="flex items-center gap-6">
-        <button className="relative text-slate-500 hover:text-primary transition-colors">
-          <Bell size={24} />
-          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-danger rounded-full border-2 border-white"></span>
+    <header className="sticky top-0 z-50 flex justify-between items-center w-full px-container-padding py-4 max-w-7xl mx-auto bg-surface border-b border-outline-variant">
+      <div className="font-headline-lg text-headline-lg font-bold text-primary">FitGuard</div>
+      <div className="flex items-center gap-4">
+        <button className="p-2 text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+          <span className="material-symbols-outlined" data-icon="notifications">notifications</span>
         </button>
-        <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-          <div className="text-right hidden md:block">
-            <p className="text-sm font-bold text-slate-700">Abd Elrahman Saeed</p>
-            <p className="text-xs text-slate-500">Pro Athlete</p>
-          </div>
-          <UserCircle size={40} className="text-slate-300" />
+        <button className="p-2 text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+          <span className="material-symbols-outlined" data-icon="settings">settings</span>
+        </button>
+        <div className="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant ml-2">
+          <img alt="Abd Elrahman Saeed profile picture" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG3EfTuCHmpMUXeqb8LDfDQ_gkQXWOO_vmna-3MJQUgoVhl30Qk6WyeJCwMWF_a_ruhNdBVduEmqpxOexo3ZjWG78p5UPpGvOISkKtKtpAd7OtuWWqRRROAxkFMSFqU2c1AFGU32bOsdjWrUt2CXF_6QdchpiOTt7psc9HSE2xHo0h7yZitg70YrZ36jsE4JuDMv4wxXElzDtthjdVSS2F_wNPv3EKNJN5Sg81n_3iKKPdcdAfQPQTi0nhVM5ORpKfaBmBVzEcQnn2"/>
         </div>
       </div>
     </header>
