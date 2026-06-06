@@ -4,7 +4,6 @@ export default function AppRoutes() {
   return (
     <Router>
       <div className="min-h-screen bg-background text-dark font-sans">
-        {/* المكان ده هنحط فيه الـ Navbar / Sidebar بعدين */}
         <main className="p-6">
           <Routes>
             <Route path="/" element={<h1 className="text-3xl font-bold text-primary">FitGuard Dashboard 🚀</h1>} />
