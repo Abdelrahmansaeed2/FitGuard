@@ -1,13 +1,15 @@
-import React from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import { Link, useLocation } from 'react-router-dom';
+import UIProvider from './UIProvider';
 
 export default function Layout({ children }) {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
 
   return (
+    <UIProvider>
+    
     <div className="text-on-background bg-surface-container-low antialiased pb-24 md:pb-0 min-h-screen">
       <Navbar />
       <div className="flex max-w-7xl mx-auto relative">
@@ -57,5 +59,7 @@ export default function Layout({ children }) {
         </Link>
       </nav>
     </div>
+      
+    </UIProvider>
   );
 }

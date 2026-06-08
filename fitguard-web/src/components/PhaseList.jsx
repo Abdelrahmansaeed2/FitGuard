@@ -5,7 +5,7 @@ const statusConfig = {
   locked:    { icon: '🔒', badge: 'Locked',     color: 'text-slate-400 bg-slate-100'   },
 }
 
-export default function PhaseList({ phases, currentPhase }) {
+export default function PhaseList({ phases, currentPhase, onPhaseClick}) {
   const getStatus = (phaseId) => {
     if (phaseId < currentPhase) return 'completed'
     if (phaseId === currentPhase) return 'active'
@@ -25,7 +25,9 @@ export default function PhaseList({ phases, currentPhase }) {
                 status !== 'locked' ? 'bg-emerald-400' : 'bg-slate-200'
               }`} />
             )}
-            <div className={`flex items-center gap-4 p-4 rounded-xl border bg-white
+            <div
+             onClick={() => onPhaseClick(phase.id)}
+             className={`flex items-center gap-4 p-4 rounded-xl border bg-white
               ${status === 'active' ? 'border-emerald-400' : 'border-slate-200'}`}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center
