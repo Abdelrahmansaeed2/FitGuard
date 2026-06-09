@@ -1,6 +1,21 @@
-const Anthropic = require('@anthropic-ai/sdk');
+const { OpenAI } = require('openai');
 
-const hasApiKey = () => !!process.env.ANTHROPIC_API_KEY;
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
+
+const hasApiKey = () => !!process.env.OPENAI_API_KEY;
+
+let openaiClient = null;
+
+const getClient = () => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is not configured. Please add it to your environment variables.');
+  }
+  if (!openaiClient) {
+    openaiClient = new OpenAI({ apiKey });
+  }
+  return openaiClient;
+};
 
 function parseCleanJson(text) {
   let cleaned = text.trim();
@@ -15,13 +30,69 @@ function parseCleanJson(text) {
   }
 }
 
-const getClient = () => {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY is not configured. Please add it to your environment variables.');
-  }
-  return new Anthropic({ apiKey });
-};
+// Prompt Helper Functions
+function getChallengeSystemPrompt() {
+  return `You are FitGuard's expert AI Sports Trainer. Your goal is to generate a personalized 30-day progressive training plan for an athlete.
+You will receive a context object containing their target sport, requested difficulty, injury history, recurring injuries, and active injuries.
+
+CRITICAL SAFETY RULES:
+1. AVOID exercises that stress actively injured muscle groups listed under "activeInjuries". Focus on safe alternatives or non-impact work for those areas.
+2. INCLUDE target strengthening, stability, and mobility exercises for repeatedly injured muscle groups listed under "recurringInjuries" to rehabilitate and protect them.
+3. The generated plan must consist of EXACTLY 30 days. No more, no less.
+4. You must output ONLY a valid JSON object matching the schema below. No explanations, no conversation, and no markdown wrapper (except the JSON format itself).
+
+Expected JSON schema:
+{
+  "days": [
+    {
+      "day": 1,
+      "task": "Perform a 5-minute light jog, 3 sets of 10 glute bridges, 3 sets of 12 bodyweight squats. Focus on core activation.",
+      "muscleGroups": ["hamstrings", "glutes", "core"],
+      "difficulty": "intermediate"
+    }
+  ]
+}
+Each day must specify a "day" number, a detailed "task" string, an array of targeted "muscleGroups", and the "difficulty" level.`;
+}
+
+function getChallengeUserPrompt(context) {
+  return `Generate the 30-day challenge plan based on this athlete context:
+${JSON.stringify(context, null, 2)}`;
+}
+
+function getRecoverySystemPrompt() {
+  return `You are FitGuard's AI Sports Rehabilitation Specialist. Your goal is to generate a phased return-to-play recovery protocol for an athlete's specific injury.
+You will receive the injury details and the athlete's full injury history context.
+
+CRITICAL Rehab RULES:
+1. Design a progressive return-to-play protocol with sequential phases (e.g., 3 to 4 phases).
+2. Avoid exercises stressing other actively injured muscle groups while rehabilitating the current injury.
+3. For each phase, specify the phaseNumber, name of the phase, duration in days, and a list of specific recovery exercises.
+4. You must output ONLY a valid JSON object matching the schema below. No explanations, no conversation, and no markdown wrapper (except the JSON format itself).
+
+Expected JSON schema:
+{
+  "phases": [
+    {
+      "phaseNumber": 1,
+      "name": "Initial Rest and Range of Motion",
+      "durationDays": 7,
+      "exercises": [
+        "Ankle alphabet drawing in air (3 sets of 2 repetitions)",
+        "Seated calf stretch with towel (hold 30s, 3 reps)"
+      ]
+    }
+  ]
+}`;
+}
+
+function getRecoveryUserPrompt(injuryLog, context) {
+  return `Generate the phased recovery protocol for this injury:
+${JSON.stringify(injuryLog, null, 2)}
+
+Athlete context:
+${JSON.stringify(context, null, 2)}`;
+}
 
 function generateMockChallenge(context) {
   const sport = context.sport || 'General Fitness';
@@ -78,7 +149,6 @@ function generateMockChallenge(context) {
   return { days };
 }
 
-
 function generateMockRecoveryProtocol(injuryLog, context) {
   const muscle = injuryLog.muscleGroup || 'injured area';
   const type = injuryLog.injuryType || 'injury';
@@ -119,104 +189,58 @@ function generateMockRecoveryProtocol(injuryLog, context) {
   };
 }
 
-
 async function generateChallenge(context) {
   if (!hasApiKey()) {
-    console.warn('[AI Mock Mode]: ANTHROPIC_API_KEY is missing. Generating a mocked 30-day challenge plan.');
+    console.warn('[AI Mock Mode]: OPENAI_API_KEY is missing. Generating a mocked 30-day challenge plan.');
     return generateMockChallenge(context);
   }
 
-  const anthropic = getClient();
+  try {
+    const openai = getClient();
 
-  const systemPrompt = `You are FitGuard's expert AI Sports Trainer. Your goal is to generate a personalized 30-day progressive training plan for an athlete.
-You will receive a context object containing their target sport, requested difficulty, injury history, recurring injuries, and active injuries.
+    const response = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: 'system', content: getChallengeSystemPrompt() },
+        { role: 'user', content: getChallengeUserPrompt(context) }
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.2
+    });
 
-CRITICAL SAFETY RULES:
-1. AVOID exercises that stress actively injured muscle groups listed under "activeInjuries". Focus on safe alternatives or non-impact work for those areas.
-2. INCLUDE target strengthening, stability, and mobility exercises for repeatedly injured muscle groups listed under "recurringInjuries" to rehabilitate and protect them.
-3. The generated plan must consist of EXACTLY 30 days. No more, no less.
-4. You must output ONLY a valid JSON object matching the schema below. No explanations, no conversation, and no markdown wrapper (except the JSON format itself).
-
-Expected JSON schema:
-{
-  "days": [
-    {
-      "day": 1,
-      "task": "Perform a 5-minute light jog, 3 sets of 10 glute bridges, 3 sets of 12 bodyweight squats. Focus on core activation.",
-      "muscleGroups": ["hamstrings", "glutes", "core"],
-      "difficulty": "intermediate"
-    }
-  ]
-}
-Each day must specify a "day" number, a detailed "task" string, an array of targeted "muscleGroups", and the "difficulty" level.`;
-
-  const userPrompt = `Generate the 30-day challenge plan based on this athlete context:
-${JSON.stringify(context, null, 2)}`;
-
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4000,
-    system: systemPrompt,
-    messages: [
-      { role: 'user', content: userPrompt }
-    ],
-    temperature: 0.2
-  });
-
-  const contentText = response.content[0].text;
-  return parseCleanJson(contentText);
+    const contentText = response.choices[0].message.content;
+    return parseCleanJson(contentText);
+  } catch (error) {
+    console.warn('OpenAI challenge generation failed, falling back to mock data:', error.message);
+    return generateMockChallenge(context);
+  }
 }
 
 async function generateRecoveryProtocol(injuryLog, context) {
   if (!hasApiKey()) {
-    console.warn('[AI Mock Mode]: ANTHROPIC_API_KEY is missing. Generating a mocked recovery protocol.');
+    console.warn('[AI Mock Mode]: OPENAI_API_KEY is missing. Generating a mocked recovery protocol.');
     return generateMockRecoveryProtocol(injuryLog, context);
   }
 
-  const anthropic = getClient();
+  try {
+    const openai = getClient();
 
-  const systemPrompt = `You are FitGuard's AI Sports Rehabilitation Specialist. Your goal is to generate a phased return-to-play recovery protocol for an athlete's specific injury.
-You will receive the injury details and the athlete's full injury history context.
+    const response = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: 'system', content: getRecoverySystemPrompt() },
+        { role: 'user', content: getRecoveryUserPrompt(injuryLog, context) }
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.2
+    });
 
-CRITICAL Rehab RULES:
-1. Design a progressive return-to-play protocol with sequential phases (e.g., 3 to 4 phases).
-2. Avoid exercises stressing other actively injured muscle groups while rehabilitating the current injury.
-3. For each phase, specify the phaseNumber, name of the phase, duration in days, and a list of specific recovery exercises.
-4. You must output ONLY a valid JSON object matching the schema below. No explanations, no conversation, and no markdown wrapper (except the JSON format itself).
-
-Expected JSON schema:
-{
-  "phases": [
-    {
-      "phaseNumber": 1,
-      "name": "Initial Rest and Range of Motion",
-      "durationDays": 7,
-      "exercises": [
-        "Ankle alphabet drawing in air (3 sets of 2 repetitions)",
-        "Seated calf stretch with towel (hold 30s, 3 reps)"
-      ]
-    }
-  ]
-}`;
-
-  const userPrompt = `Generate the phased recovery protocol for this injury:
-${JSON.stringify(injuryLog, null, 2)}
-
-Athlete context:
-${JSON.stringify(context, null, 2)}`;
-
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4000,
-    system: systemPrompt,
-    messages: [
-      { role: 'user', content: userPrompt }
-    ],
-    temperature: 0.2
-  });
-
-  const contentText = response.content[0].text;
-  return parseCleanJson(contentText);
+    const contentText = response.choices[0].message.content;
+    return parseCleanJson(contentText);
+  } catch (error) {
+    console.warn('OpenAI recovery protocol generation failed, falling back to mock data:', error.message);
+    return generateMockRecoveryProtocol(injuryLog, context);
+  }
 }
 
 module.exports = {
