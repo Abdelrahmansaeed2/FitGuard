@@ -1,6 +1,6 @@
 # FitGuard Core Backend
 
-FitGuard is an AI-powered sports training and rehabilitation backend built using Node.js, Express, and MongoDB. It utilizes the Anthropic Claude API (`claude-sonnet-4-20250514`) to safely generate progressive 30-day training challenges and phased return-to-play recovery protocols based on athlete profiles and injury logs history.
+FitGuard is an AI-powered sports training and rehabilitation backend built using Node.js, Express, and MongoDB. It utilizes the OpenAI ChatGPT API (`gpt-4o`) to safely generate progressive 30-day training challenges and phased return-to-play recovery protocols based on athlete profiles and injury logs history.
 
 ---
 
@@ -21,7 +21,7 @@ FitGuard is an AI-powered sports training and rehabilitation backend built using
 - **JWT (Access & Refresh Tokens)**
 - **bcryptjs** (Password hashing)
 - **express-validator** (Request input validation)
-- **@anthropic-ai/sdk** (Anthropic Claude API client integration)
+- **openai** (OpenAI ChatGPT API client integration)
 
 ---
 
@@ -43,7 +43,8 @@ FitGuard is an AI-powered sports training and rehabilitation backend built using
    - `MONGO_URI`: MongoDB connection string
    - `JWT_SECRET`: Secret key for access tokens
    - `JWT_REFRESH_SECRET`: Secret key for refresh tokens
-   - `ANTHROPIC_API_KEY`: Anthropic developer API key
+   - `OPENAI_API_KEY`: OpenAI developer API key
+   - `OPENAI_MODEL`: OpenAI model choice (default: `gpt-4o`)
    - `FRONTEND_URL`: Production URL of the frontend (for CORS whitelist)
 
 3. **Start Development Server**
@@ -190,7 +191,7 @@ All responses follow the structured output format:
       "difficulty": "intermediate"
     }
     ```
-  - **AI Prompt Action**: Gathers user profile & full injury patterns (active + recurring muscles). Instructs Claude to compile a safe 30-day program avoiding active injury zones and targeting weak/recurring injury muscle groups for strengthening.
+  - **AI Prompt Action**: Gathers user profile & full injury patterns (active + recurring muscles). Instructs OpenAI ChatGPT to compile a safe 30-day program avoiding active injury zones and targeting weak/recurring injury muscle groups for strengthening.
   - **Response**: Newly created active Challenge schema containing a 30-day task list.
 
 * **GET `/api/challenges`**
@@ -217,7 +218,7 @@ All responses follow the structured output format:
       "injuryLogId": "your_active_injury_log_id"
     }
     ```
-  - **AI Prompt Action**: Feeds target injury plus overall athlete medical history to Claude. Generates progressive rehabilitation phases (Phase 1, Phase 2, etc.) loaded with specific clinical recovery routines.
+  - **AI Prompt Action**: Feeds target injury plus overall athlete medical history to OpenAI ChatGPT. Generates progressive rehabilitation phases (Phase 1, Phase 2, etc.) loaded with specific clinical recovery routines.
   - **Response**: Created active RecoveryProtocol schema with list of rehabilitation phases.
 
 * **GET `/api/recovery`**
