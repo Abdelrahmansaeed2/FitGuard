@@ -1,7 +1,9 @@
-import AppRoutes from './routes/AppRoutes';
 
-function App() {
-  return <AppRoutes />;
+
+import ChallengeView from "./features/challenges/Components/ChallengeView";
+
+function App(){
+  return <ChallengeView/>
 }
 
-export default App;
+export default App
