@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAthleteStore } from '../store/useAthleteStore';
+import { useProfileStore } from '../store/profileStore';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AthleteProfileDashboard() {
-  const { profile, injuries, addInjury } = useAthleteStore();
+  const { profile, fetchProfile } = useProfileStore();
+  const { injuries, addInjury } = useAthleteStore();
   const [formData, setFormData] = useState({ muscle: '', severity: 'low' });
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
