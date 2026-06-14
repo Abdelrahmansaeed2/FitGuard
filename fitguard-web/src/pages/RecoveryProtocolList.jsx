@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useRecoveryStore } from '../store/recoveryStore';
 
 export default function RecoveryProtocolList() {
-  const { protocols, activeProtocol, fetchProtocols, fetchActiveProtocol, loading } = useRecoveryStore();
+  const { protocols, activeProtocol, fetchProtocols, fetchActiveProtocol, toggleExercise, loading } = useRecoveryStore();
 
   useEffect(() => {
     fetchProtocols();
@@ -111,15 +111,23 @@ export default function RecoveryProtocolList() {
               </div>
               <div className="space-y-3">
                 {currentPhaseData?.exercises?.map((exercise, idx) => (
-                  <label key={idx} className={`flex items-start space-x-4 p-4 rounded-lg border cursor-pointer transition-all border-primary-container bg-surface-container-lowest shadow-sm hover:shadow-md`}>
-                    <input type="checkbox" className="mt-1 w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary focus:ring-offset-surface" />
+                  <label key={exercise.id || exercise._id || idx} className="flex items-start space-x-4 p-4 rounded-lg border cursor-pointer transition-all border-primary-container bg-surface-container-lowest shadow-sm hover:shadow-md">
+                    <input 
+                      type="checkbox" 
+                      checked={exercise.completed || false}
+                      onChange={() => toggleExercise(activeProtocol.id || activeProtocol._id, activeProtocol.currentPhase, exercise.id || exercise._id)}
+                      className="mt-1 w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary focus:ring-offset-surface" 
+                    />
                     <div className="flex-grow">
-                      <p className={`font-body-md text-body-md font-medium text-on-background`}>{exercise.name || exercise}</p>
+                      <p className={`font-body-md text-body-md font-medium text-on-background ${exercise.completed ? 'line-through opacity-60' : ''}`}>
+                        {exercise.title || exercise.name || (typeof exercise === 'string' ? exercise : 'Untitled Exercise')}
+                      </p>
                       {exercise.sets && <p className="text-sm text-on-surface-variant">{exercise.sets} sets x {exercise.reps}</p>}
+                      {exercise.duration && <p className="text-sm text-on-surface-variant">{exercise.duration} mins/secs</p>}
                     </div>
-                      <button className="text-on-surface-variant hover:text-primary" title="View Technique">
-                        <span className="material-symbols-outlined">play_circle</span>
-                      </button>
+                    <button className="text-on-surface-variant hover:text-primary" title="View Technique">
+                      <span className="material-symbols-outlined">play_circle</span>
+                    </button>
                   </label>
                 ))}
               </div>
