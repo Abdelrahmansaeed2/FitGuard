@@ -68,5 +68,18 @@ export const useRecoveryStore = create((set) => ({
       set({ error: err.message || 'Failed to complete phase', loading: false });
       throw err;
     }
+  },
+
+  toggleExercise: async (id, phaseNumber, exerciseId) => {
+    try {
+      const updatedProtocol = await recoveryService.toggleRecoveryExercise(id, phaseNumber, exerciseId);
+      set((state) => ({
+        activeProtocol: state.activeProtocol?.id === id ? updatedProtocol : state.activeProtocol,
+        protocols: state.protocols.map(p => p.id === id ? updatedProtocol : p)
+      }));
+    } catch (err) {
+      set({ error: err.message || 'Failed to toggle exercise' });
+      throw err;
+    }
   }
 }));

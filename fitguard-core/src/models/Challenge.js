@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const exerciseSchema = require('./Exercise');
 
 const dayPlanSchema = new mongoose.Schema({
   day: {
@@ -7,7 +8,11 @@ const dayPlanSchema = new mongoose.Schema({
   },
   task: {
     type: String,
-    required: true
+    required: false
+  },
+  exercises: {
+    type: [exerciseSchema],
+    default: []
   },
   muscleGroups: {
     type: [String],
@@ -58,6 +63,9 @@ const challengeSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  completedAt: {
+    type: Date
   }
 });
 

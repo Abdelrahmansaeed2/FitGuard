@@ -51,4 +51,15 @@ router.put(
   challengeController.abandonChallenge
 );
 
+router.put(
+  '/:id/day/:dayNumber/exercise/:exerciseId/toggle',
+  [
+    param('id').isMongoId().withMessage('Invalid challenge ID'),
+    param('dayNumber').isInt({ min: 1, max: 30 }).withMessage('Day number must be between 1 and 30'),
+    param('exerciseId').isMongoId().withMessage('Invalid exercise ID')
+  ],
+  validate,
+  challengeController.toggleExercise
+);
+
 module.exports = router;

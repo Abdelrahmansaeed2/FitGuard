@@ -13,14 +13,16 @@ export default function InjuryAnalytics() {
     
     // Severity breakdown (assuming 1-10 scale)
     let severe = 0;
+    let moderate = 0;
     let mild = 0;
     
     // Muscle groups
     const muscleGroups = {};
     
     injuries.forEach(inj => {
-      const severity = parseInt(inj.severity) || 5;
-      if (severity >= 7) severe++;
+      const severity = inj.severity?.toLowerCase() || 'mild';
+      if (severity === 'severe') severe++;
+      else if (severity === 'moderate') moderate++;
       else mild++;
       
       const mg = inj.muscleGroup || 'Unknown';
@@ -33,8 +35,9 @@ export default function InjuryAnalytics() {
     return {
       total,
       severe,
-      mild,
+      moderate,
       severePercent: total ? Math.round((severe / total) * 100) : 0,
+      moderatePercent: total ? Math.round((moderate / total) * 100) : 0,
       mildPercent: total ? Math.round((mild / total) * 100) : 0,
       sortedMuscles,
       mostAffected: sortedMuscles[0]?.[0] || 'None'
@@ -106,11 +109,15 @@ export default function InjuryAnalytics() {
           </div>
           <div className="flex flex-col gap-3 mt-auto border-t border-outline-variant pt-4">
             <div className="flex justify-between items-center text-body-sm font-body-sm">
-              <span className="flex items-center gap-2 text-on-surface"><div className="w-3 h-3 rounded bg-error"></div> Severe (7-10)</span>
+              <span className="flex items-center gap-2 text-on-surface"><div className="w-3 h-3 rounded bg-error"></div> Severe</span>
               <span className="font-mono-data text-mono-data">{stats?.severePercent || 0}%</span>
             </div>
             <div className="flex justify-between items-center text-body-sm font-body-sm">
-              <span className="flex items-center gap-2 text-on-surface"><div className="w-3 h-3 rounded bg-primary"></div> Mild (1-6)</span>
+              <span className="flex items-center gap-2 text-on-surface"><div className="w-3 h-3 rounded bg-secondary"></div> Moderate</span>
+              <span className="font-mono-data text-mono-data">{stats?.moderatePercent || 0}%</span>
+            </div>
+            <div className="flex justify-between items-center text-body-sm font-body-sm">
+              <span className="flex items-center gap-2 text-on-surface"><div className="w-3 h-3 rounded bg-primary"></div> Mild</span>
               <span className="font-mono-data text-mono-data">{stats?.mildPercent || 0}%</span>
             </div>
           </div>

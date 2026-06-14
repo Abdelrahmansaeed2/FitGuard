@@ -95,12 +95,16 @@ apiClient.interceptors.response.use(
 
       try {
         // Attempt to refresh the token
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {}, {
+        const refreshToken = localStorage.getItem('refresh_token');
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken }, {
           withCredentials: true // Assuming refresh token is in HttpOnly cookie, or adjust if payload based
         });
 
-        const newAccessToken = response.data.access_token;
-        localStorage.setItem('access_token', newAccessToken);
+        const newAccessToken = response.data.data ? response.data.data.accessToken : response.data.access_token;
+        const newRefreshToken = response.data.data ? response.data.data.refreshToken : response.data.refreshToken;
+        
+        if (newAccessToken) localStorage.setItem('access_token', newAccessToken);
+        if (newRefreshToken) localStorage.setItem('refresh_token', newRefreshToken);
 
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -111,6 +115,7 @@ apiClient.interceptors.response.use(
         processQueue(refreshError, null);
         // Force logout if refresh fails
         localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         window.location.href = '/login'; // Native redirect since Zustand is banned for now
         return Promise.reject(refreshError);
       } finally {

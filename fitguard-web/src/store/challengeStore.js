@@ -70,6 +70,19 @@ export const useChallengeStore = create((set) => ({
     }
   },
 
+  toggleChallengeExercise: async (id, dayNumber, exerciseId) => {
+    try {
+      const updatedChallenge = await challengeService.toggleChallengeExercise(id, dayNumber, exerciseId);
+      set((state) => ({
+        activeChallenge: state.activeChallenge?.id === id ? updatedChallenge : state.activeChallenge,
+        challenges: state.challenges.map(c => c.id === id ? updatedChallenge : c)
+      }));
+    } catch (err) {
+      set({ error: err.message || 'Failed to toggle exercise' });
+      throw err;
+    }
+  },
+
   abandonChallenge: async (id) => {
     set({ loading: true, error: null });
     try {

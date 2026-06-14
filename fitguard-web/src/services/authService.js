@@ -6,6 +6,9 @@ export const authService = {
     if (response.data.access_token) {
       localStorage.setItem('access_token', response.data.access_token);
     }
+    if (response.data.refreshToken) {
+      localStorage.setItem('refresh_token', response.data.refreshToken);
+    }
     return response.data;
   },
 
@@ -14,16 +17,21 @@ export const authService = {
     if (response.data.access_token) {
       localStorage.setItem('access_token', response.data.access_token);
     }
+    if (response.data.refreshToken) {
+      localStorage.setItem('refresh_token', response.data.refreshToken);
+    }
     return response.data;
   },
 
   logout: async () => {
     try {
-      await apiClient.post('/auth/logout');
+      const refreshToken = localStorage.getItem('refresh_token');
+      await apiClient.post('/auth/logout', { refreshToken });
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
       localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
     }
   },
 
@@ -33,9 +41,13 @@ export const authService = {
   },
 
   refreshToken: async () => {
-    const response = await apiClient.post('/auth/refresh-token');
+    const refresh_token = localStorage.getItem('refresh_token');
+    const response = await apiClient.post('/auth/refresh-token', { refreshToken: refresh_token });
     if (response.data.access_token) {
       localStorage.setItem('access_token', response.data.access_token);
+    }
+    if (response.data.refreshToken) {
+      localStorage.setItem('refresh_token', response.data.refreshToken);
     }
     return response.data;
   }

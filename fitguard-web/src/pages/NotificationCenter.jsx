@@ -2,12 +2,14 @@ import { useEffect } from 'react';
 import { useNotificationStore } from '../store/notificationStore';
 
 export default function NotificationCenter() {
-  const { notifications, fetchNotifications, markAllRead, markRead } = useNotificationStore();
+  const { notifications, unreadCount, fetchNotifications, markAllRead, markRead, deleteNotification } = useNotificationStore();
 
   useEffect(() => {
     fetchNotifications();
   } // eslint-disable-next-line react-hooks/exhaustive-deps
   , []);
+
+  const aiInsightsCount = notifications.filter(n => n.type === 'challenge_nudge' && !n.read).length;
 
   return (
     <div className="flex-1 p-margin-desktop max-w-container-max mx-auto w-full">
@@ -38,7 +40,7 @@ export default function NotificationCenter() {
                   <span className="material-symbols-outlined mr-3 text-on-surface-variant text-[20px]">inbox</span>
                   All Notifications
                 </span>
-                <span className="bg-surface-variant text-on-surface-variant text-xs px-2 py-0.5 rounded-full font-mono-data">12</span>
+                {unreadCount > 0 && <span className="bg-surface-variant text-on-surface-variant text-xs px-2 py-0.5 rounded-full font-mono-data">{unreadCount}</span>}
               </button>
               <button className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low font-body-md text-body-md text-left transition-colors">
                 <span className="flex items-center">
@@ -51,7 +53,7 @@ export default function NotificationCenter() {
                   <span className="material-symbols-outlined mr-3 text-secondary text-[20px]">smart_toy</span>
                   AI Insights
                 </span>
-                <span className="bg-secondary-fixed text-on-secondary-fixed text-xs px-2 py-0.5 rounded-full font-mono-data">3</span>
+                {aiInsightsCount > 0 && <span className="bg-secondary-fixed text-on-secondary-fixed text-xs px-2 py-0.5 rounded-full font-mono-data">{aiInsightsCount}</span>}
               </button>
               <button className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low font-body-md text-body-md text-left transition-colors">
                 <span className="flex items-center">
@@ -128,6 +130,9 @@ export default function NotificationCenter() {
                         {notification.message}
                       </p>
                     </div>
+                    <button onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }} className="ml-4 text-on-surface-variant hover:text-error transition-colors">
+                      <span className="material-symbols-outlined">delete</span>
+                    </button>
                   </div>
                 </div>
               );

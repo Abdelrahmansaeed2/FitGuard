@@ -235,3 +235,39 @@ exports.completePhase = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.toggleExercise = async (req, res, next) => {
+  try {
+    const { id, phaseNumber, exerciseId } = req.params;
+    const phaseVal = parseInt(phaseNumber, 10);
+
+    const protocol = await RecoveryProtocol.findOne({ _id: id, userId: req.user._id });
+    if (!protocol) {
+      return res.status(404).json({ success: false, data: null, message: 'Protocol not found' });
+    }
+
+    const phase = protocol.phases.find(p => p.phaseNumber === phaseVal);
+    if (!phase) {
+      return res.status(404).json({ success: false, data: null, message: 'Phase not found' });
+    }
+
+    const exercise = phase.exercises.id(exerciseId);
+    if (!exercise) {
+      return res.status(404).json({ success: false, data: null, message: 'Exercise not found' });
+    }
+
+    exercise.completed = !exercise.completed;
+    exercise.completedAt = exercise.completed ? new Date() : null;
+
+    protocol.markModified('phases');
+    await protocol.save();
+
+    res.status(200).json({
+      success: true,
+      data: protocol,
+      message: 'Exercise toggled successfully'
+    });
+  } catch (err) {
+    next(err);
+  }
+};

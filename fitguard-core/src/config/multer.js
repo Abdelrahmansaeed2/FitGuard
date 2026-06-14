@@ -1,14 +1,23 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// Configure Cloudinary
+if (process.env.CLOUDINARY_URL) {
+  // CLOUDINARY_URL format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+  cloudinary.config(true);
+} else {
+  console.warn('[Warning]: CLOUDINARY_URL is missing. Uploads will be saved locally and may be lost on ephemeral environments like Vercel/Render.');
+}
 
 const uploadDir = path.join(__dirname, '../../uploads');
-
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
   },
@@ -17,6 +26,16 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
+
+const cloudStorage = process.env.CLOUDINARY_URL ? new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'fitguard',
+    allowed_formats: ['jpg', 'png', 'pdf'],
+  },
+}) : null;
+
+const storage = cloudStorage || diskStorage;
 
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];

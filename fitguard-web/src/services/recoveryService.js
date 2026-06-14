@@ -21,6 +21,11 @@ export const recoveryService = {
     return response.data;
   },
 
+  toggleRecoveryExercise: async (id, phaseNumber, exerciseId) => {
+    const response = await apiClient.put(`/recovery/${id}/phase/${phaseNumber}/exercise/${exerciseId}/toggle`);
+    return response.data;
+  },
+
   getRecoveryById: async (id) => {
     const response = await apiClient.get(`/recovery/${id}`);
     return response.data;

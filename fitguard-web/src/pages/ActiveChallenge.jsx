@@ -1,68 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useChallengeStore } from '../store/challengeStore';
 import { Link } from 'react-router-dom';
 
 export default function ActiveChallenge() {
-  const { activeChallenge, fetchActiveChallenge, completeDay } = useChallengeStore();
+  const { activeChallenge, completeDay, toggleChallengeExercise, abandonChallenge } = useChallengeStore();
   const [view, setView] = useState('dashboard'); // 'dashboard' | 'tasks'
-
-  useEffect(() => {
-    fetchActiveChallenge();
-  }, [fetchActiveChallenge]);
-
-  const currentDayIndex = activeChallenge ? activeChallenge.generatedPlan.findIndex(d => !d.completed) : 0;
-  const currentDay = currentDayIndex === -1 ? 30 : currentDayIndex + 1;
-  const planForToday = activeChallenge ? activeChallenge.generatedPlan[currentDay - 1] : null;
-
-  const handleCompleteDay = async () => {
-    if (activeChallenge) {
-      await completeDay(activeChallenge.id, currentDay);
-      setView('dashboard');
-    }
-  };
-
-  const renderDays = () => {
-    const days = [];
-    for (let i = 1; i <= 30; i++) {
-      let statusClass;
-      let icon;
-      const isCompleted = activeChallenge && activeChallenge.generatedPlan[i - 1]?.completed;
-      const isToday = i === currentDay;
-
-      if (isCompleted) {
-        // Completed
-        statusClass = "bg-primary-container text-on-primary-container border-transparent";
-        icon = <span className="material-symbols-outlined text-[16px] opacity-50">check</span>;
-      } else if (isToday) {
-        // Today
-        statusClass = "bg-secondary-fixed text-on-secondary-fixed border-secondary shadow-sm ring-2 ring-secondary ring-offset-2 ring-offset-surface-container-lowest";
-        icon = <span className="font-mono-data text-mono-data font-bold">{i}</span>;
-      } else {
-        // Locked
-        statusClass = "bg-surface-container text-outline border-outline-variant opacity-50";
-        icon = <span className="material-symbols-outlined text-[16px]">lock</span>;
-      }
-      days.push(
-        <div key={i} className={`aspect-square rounded-lg border flex flex-col items-center justify-center relative group cursor-default transition-transform hover:scale-105 ${statusClass}`}>
-          <span className="absolute top-1 left-1.5 text-[10px] font-bold opacity-40">{!isCompleted && !isToday ? i : ''}</span>
-          {icon}
-        </div>
-      );
-    }
-    return days;
-  };
-
-  const [localTaskCompleted, setLocalTaskCompleted] = useState(false);
-
-  const toggleTask = () => {
-    setLocalTaskCompleted(!localTaskCompleted);
-  };
+  const [showAbandonModal, setShowAbandonModal] = useState(false);
 
   if (!activeChallenge) {
     return <div className="p-8 text-center">No active challenge found. <Link to="/challenges/generate" className="text-primary underline">Generate one</Link></div>;
   }
 
   const completedDaysCount = activeChallenge.generatedPlan.filter(d => d.completed).length;
+  const currentDay = activeChallenge.generatedPlan.findIndex(d => !d.completed) + 1 || activeChallenge.generatedPlan.length;
+  const planForToday = activeChallenge.generatedPlan.find(d => !d.completed) || activeChallenge.generatedPlan[activeChallenge.generatedPlan.length - 1];
+  
+  const handleCompleteDay = async () => {
+    await completeDay(activeChallenge.id || activeChallenge._id, currentDay);
+  };
+
+  const handleAbandonChallenge = async () => {
+    await abandonChallenge(activeChallenge.id || activeChallenge._id);
+    setShowAbandonModal(false);
+  };
+  
+  const exercises = planForToday?.exercises || [];
+  const completedExercisesCount = exercises.filter(ex => ex.completed).length;
+  const totalExercises = exercises.length;
+  const allExercisesCompleted = totalExercises > 0 ? completedExercisesCount === totalExercises : false;
 
   return (
     <div className="p-margin-mobile md:p-margin-desktop bg-surface-bright min-h-[calc(100vh-64px)] overflow-y-auto">
@@ -75,9 +40,14 @@ export default function ActiveChallenge() {
               <p className="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">AI Program Active</p>
               <h2 className="font-display-md text-display-md text-on-surface">30-Day Resilience Challenge</h2>
             </div>
-            <Link to="/challenges/1" className="px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-full hover:bg-surface-container-low transition-colors">
-              View Guidelines
-            </Link>
+            <div className="flex gap-4">
+              <button onClick={() => setShowAbandonModal(true)} className="px-6 py-2 border border-error text-error font-label-md text-label-md rounded-full hover:bg-error-container transition-colors">
+                Abandon
+              </button>
+              <Link to={`/challenges/${activeChallenge.id || activeChallenge._id}`} className="px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-full hover:bg-surface-container-low transition-colors">
+                View Guidelines
+              </Link>
+            </div>
           </div>
 
           {/* Dashboard Grid (Bento Style) */}
@@ -161,7 +131,20 @@ export default function ActiveChallenge() {
               </div>
               {/* Grid */}
               <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
-                {renderDays()}
+                {activeChallenge.generatedPlan.map((dayObj, index) => {
+                  const isCompleted = dayObj.completed;
+                  const isToday = !isCompleted && currentDay === dayObj.day;
+                  let bgClass = "bg-surface-container-highest opacity-60"; // Locked
+                  if (isCompleted) bgClass = "bg-primary text-on-primary shadow-sm";
+                  else if (isToday) bgClass = "bg-secondary-container text-on-secondary-container shadow-md scale-105 transform border border-secondary";
+                  
+                  return (
+                    <div key={index} className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all ${bgClass}`}>
+                      <span className="font-label-md text-label-md mb-1">Day</span>
+                      <span className="font-headline-md text-headline-md">{dayObj.day}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -194,36 +177,44 @@ export default function ActiveChallenge() {
               <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="font-headline-md text-headline-md text-on-surface">Today's Protocol</h3>
-                  <span className="bg-primary-container text-on-primary-container font-label-md text-label-md px-3 py-1 rounded-full">{localTaskCompleted ? '1/1' : '0/1'} Completed</span>
+                  <span className="bg-primary-container text-on-primary-container font-label-md text-label-md px-3 py-1 rounded-full">{completedExercisesCount}/{totalExercises} Completed</span>
                 </div>
                 
                 <div className="space-y-4">
-                  <div 
-                    className={`flex items-center p-4 border rounded-lg transition-all ${localTaskCompleted ? 'bg-surface-container-low border-outline-variant' : 'bg-surface-container-lowest border-outline-variant hover:border-outline group'}`}
-                  >
-                    <div className="relative flex items-center justify-center mr-4">
-                      <input 
-                        type="checkbox" 
-                        checked={localTaskCompleted}
-                        onChange={toggleTask}
-                        className="w-6 h-6 border-outline text-primary rounded-sm focus:ring-primary focus:ring-opacity-50 cursor-pointer" 
-                      />
+                  {exercises.map((ex, idx) => (
+                    <div 
+                      key={ex.id || ex._id || idx}
+                      className={`flex items-center p-4 border rounded-lg transition-all ${ex.completed ? 'bg-surface-container-low border-outline-variant' : 'bg-surface-container-lowest border-outline-variant hover:border-outline group'}`}
+                    >
+                      <div className="relative flex items-center justify-center mr-4">
+                        <input 
+                          type="checkbox" 
+                          checked={ex.completed}
+                          onChange={() => toggleChallengeExercise(activeChallenge.id, currentDay, ex.id || ex._id)}
+                          className="w-6 h-6 border-outline text-primary rounded-sm focus:ring-primary focus:ring-opacity-50 cursor-pointer" 
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className={`font-headline-sm text-headline-sm text-on-surface ${ex.completed ? 'line-through text-opacity-60' : ''}`}>{ex.title}</h4>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                          {ex.sets && ex.reps ? `${ex.sets} sets x ${ex.reps} reps` : ex.description || 'Focus on form'}
+                        </p>
+                      </div>
+                      <span className={`material-symbols-outlined ${ex.completed ? 'text-outline-variant' : 'text-secondary group-hover:scale-110 transition-transform'}`}>
+                        fitness_center
+                      </span>
                     </div>
-                    <div className="flex-1">
-                      <h4 className={`font-headline-sm text-headline-sm text-on-surface ${localTaskCompleted ? 'line-through text-opacity-60' : ''}`}>{planForToday?.task}</h4>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">Focus on: {planForToday?.muscleGroups.join(', ')}</p>
-                    </div>
-                    <span className={`material-symbols-outlined ${localTaskCompleted ? 'text-outline-variant' : 'text-secondary group-hover:scale-110 transition-transform'}`}>
-                      fitness_center
-                    </span>
-                  </div>
+                  ))}
+                  {exercises.length === 0 && (
+                     <p className="text-on-surface-variant text-center">No structured exercises found for today.</p>
+                  )}
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-outline-variant">
                   <button 
                     onClick={handleCompleteDay}
                     className="w-full bg-primary hover:bg-surface-tint text-on-primary font-headline-sm text-headline-sm py-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
-                    disabled={!localTaskCompleted}
+                    disabled={!allExercisesCompleted && totalExercises > 0}
                   >
                     <span className="material-symbols-outlined">check_circle</span>
                     <span>Complete Day</span>
@@ -249,14 +240,14 @@ export default function ActiveChallenge() {
                       fill="transparent" 
                       r="40" 
                       strokeDasharray="251.2" 
-                      strokeDashoffset={251.2 - (251.2 * (localTaskCompleted ? 1 : 0))} 
+                      strokeDashoffset={251.2 - (251.2 * (totalExercises > 0 ? completedExercisesCount / totalExercises : 0))} 
                       strokeLinecap="round" 
                       strokeWidth="8"
                       style={{ transition: 'stroke-dashoffset 0.35s' }}
                     ></circle>
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center">
-                    <span className="font-display-md text-display-md text-on-surface">{localTaskCompleted ? '100%' : '0%'}</span>
+                    <span className="font-display-md text-display-md text-on-surface">{totalExercises > 0 ? Math.round((completedExercisesCount / totalExercises) * 100) : 0}%</span>
                     <span className="font-label-md text-label-md text-on-surface-variant">Completed</span>
                   </div>
                 </div>
@@ -281,6 +272,35 @@ export default function ActiveChallenge() {
                 </div>
               </div>
 
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Abandon Modal */}
+      {showAbandonModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-on-background bg-opacity-50 backdrop-blur-sm">
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xl p-8 max-w-sm w-full mx-4 text-center transform transition-all scale-100 opacity-100">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-error-container mb-6">
+              <span className="material-symbols-outlined text-error text-4xl">warning</span>
+            </div>
+            <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Abandon Challenge?</h3>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">
+              Are you sure you want to abandon this challenge? All progress will be logged as incomplete, and this action cannot be undone.
+            </p>
+            <div className="flex flex-col space-y-3">
+              <button 
+                onClick={handleAbandonChallenge}
+                className="w-full bg-error text-on-error font-label-md text-label-md py-3 rounded-lg hover:bg-error-container hover:text-error transition-colors"
+              >
+                Yes, Abandon
+              </button>
+              <button 
+                onClick={() => setShowAbandonModal(false)}
+                className="w-full bg-transparent border border-outline-variant text-on-surface font-label-md text-label-md py-3 rounded-lg hover:bg-surface-container-low transition-colors"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

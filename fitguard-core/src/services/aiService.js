@@ -48,7 +48,16 @@ Expected JSON schema:
       "day": 1,
       "task": "Perform a 5-minute light jog, 3 sets of 10 glute bridges, 3 sets of 12 bodyweight squats. Focus on core activation.",
       "muscleGroups": ["hamstrings", "glutes", "core"],
-      "difficulty": "intermediate"
+      "difficulty": "intermediate",
+      "exercises": [
+        {
+          "title": "Bodyweight Squats",
+          "description": "Keep chest up and knees behind toes.",
+          "sets": 3,
+          "reps": 12,
+          "duration": null
+        }
+      ]
     }
   ]
 }
@@ -80,8 +89,20 @@ Expected JSON schema:
       "name": "Initial Rest and Range of Motion",
       "durationDays": 7,
       "exercises": [
-        "Ankle alphabet drawing in air (3 sets of 2 repetitions)",
-        "Seated calf stretch with towel (hold 30s, 3 reps)"
+        {
+          "title": "Ankle alphabet drawing in air",
+          "description": "Draw A-Z with big toe.",
+          "sets": 3,
+          "reps": 2,
+          "duration": null
+        },
+        {
+          "title": "Seated calf stretch with towel",
+          "description": "Keep knee straight.",
+          "sets": 3,
+          "reps": 1,
+          "duration": "30s"
+        }
       ]
     }
   ]
@@ -144,7 +165,16 @@ function generateMockChallenge(context) {
       day: d,
       task: `[Day ${d}] ${task} Level: ${difficulty}.`,
       muscleGroups: targeted,
-      difficulty: difficulty
+      difficulty: difficulty,
+      exercises: [
+        {
+          title: "Mock Exercise",
+          description: task,
+          sets: 3,
+          reps: 10,
+          duration: null
+        }
+      ]
     });
   }
 
@@ -164,9 +194,20 @@ function generateMockRecoveryProtocol(injuryLog, context) {
         name: `Rest & Gentle Mobility for ${muscle} ${type}`,
         durationDays: 7,
         exercises: [
-          `Gentle passive stretching of the ${muscle} (hold 15s, 3 reps)`,
-          `RICE treatment protocol (Rest, Ice, Compress, Elevate)`,
-          `Isometric activation holding for 5 seconds (10 repetitions)`
+          {
+            title: `Gentle passive stretching of the ${muscle}`,
+            description: "Hold gently without pain.",
+            sets: 3,
+            reps: 1,
+            duration: "15s"
+          },
+          {
+            title: "RICE treatment protocol",
+            description: "Rest, Ice, Compress, Elevate.",
+            sets: 1,
+            reps: 1,
+            duration: "20m"
+          }
         ]
       },
       {
@@ -174,9 +215,20 @@ function generateMockRecoveryProtocol(injuryLog, context) {
         name: `Active Movement & Stability`,
         durationDays: 10,
         exercises: [
-          `Active ranges of motion without weight for ${muscle} (15 reps)`,
-          `Core alignment planks (hold 30s, 3 reps)`,
-          `Light stability exercises`
+          {
+            title: `Active ranges of motion for ${muscle}`,
+            description: "No weight.",
+            sets: 3,
+            reps: 15,
+            duration: null
+          },
+          {
+            title: "Core alignment planks",
+            description: "Maintain straight back.",
+            sets: 3,
+            reps: 1,
+            duration: "30s"
+          }
         ]
       },
       {
@@ -184,9 +236,13 @@ function generateMockRecoveryProtocol(injuryLog, context) {
         name: `Progressive Strengthening & Return to ${context.sport || 'play'}`,
         durationDays: 14,
         exercises: [
-          `Resisted concentric exercises for ${muscle} (3 sets of 8 reps)`,
-          `Dynamic balance and core stabilization`,
-          `Low impact sport-specific agility drills`
+          {
+            title: `Resisted concentric exercises for ${muscle}`,
+            description: "Use resistance band.",
+            sets: 3,
+            reps: 8,
+            duration: null
+          }
         ]
       }
     ]
@@ -209,7 +265,8 @@ async function generateChallenge(context) {
         { role: 'user', content: getChallengeUserPrompt(context) }
       ],
       response_format: { type: 'json_object' },
-      temperature: 0.2
+      temperature: 0.2,
+      timeout: 15000
     });
 
     const contentText = response.choices[0].message.content;
@@ -236,7 +293,8 @@ async function generateRecoveryProtocol(injuryLog, context) {
         { role: 'user', content: getRecoveryUserPrompt(injuryLog, context) }
       ],
       response_format: { type: 'json_object' },
-      temperature: 0.2
+      temperature: 0.2,
+      timeout: 15000
     });
 
     const contentText = response.choices[0].message.content;

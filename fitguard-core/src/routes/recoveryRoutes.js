@@ -40,4 +40,15 @@ router.put(
   recoveryController.completePhase
 );
 
+router.put(
+  '/:id/phase/:phaseNumber/exercise/:exerciseId/toggle',
+  [
+    param('id').isMongoId().withMessage('Invalid protocol ID'),
+    param('phaseNumber').isInt({ min: 1 }).withMessage('Phase number must be a positive integer'),
+    param('exerciseId').isMongoId().withMessage('Invalid exercise ID')
+  ],
+  validate,
+  recoveryController.toggleExercise
+);
+
 module.exports = router;

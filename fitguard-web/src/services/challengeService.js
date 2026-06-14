@@ -21,6 +21,11 @@ export const challengeService = {
     return response.data;
   },
 
+  toggleChallengeExercise: async (id, dayNumber, exerciseId) => {
+    const response = await apiClient.put(`/challenges/${id}/day/${dayNumber}/exercise/${exerciseId}/toggle`);
+    return response.data;
+  },
+
   abandonChallenge: async (id) => {
     const response = await apiClient.put(`/challenges/${id}/abandon`);
     return response.data;

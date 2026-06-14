@@ -64,7 +64,7 @@ export default function InjuryList() {
                         <span className="text-on-surface-variant font-mono-data text-mono-data text-[12px]">{injury.id}</span>
                       </div>
                       <h3 className="font-headline-md text-headline-md text-on-background">{injury.injuryType}</h3>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">{injury.muscleGroup} • {new Date(injury.date).toLocaleDateString()}</p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">{injury.muscleGroup} • {new Date(injury.dateOccurred).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-4 border-t border-surface-variant pt-4 mt-2">
@@ -97,7 +97,7 @@ export default function InjuryList() {
                 <span className="text-on-surface-variant font-mono-data text-mono-data text-[12px]">{injury.id}</span>
               </div>
               <h3 className="font-headline-sm text-headline-sm text-on-background mb-1">{injury.injuryType}</h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">{injury.muscleGroup} • {new Date(injury.date).toLocaleDateString()}</p>
+              <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">{injury.muscleGroup} • {new Date(injury.dateOccurred).toLocaleDateString()}</p>
               <div className="mt-auto space-y-3 border-t border-surface-variant pt-4">
                 <div className="flex justify-between items-center">
                   <span className="font-label-md text-[11px] text-on-surface-variant uppercase">Recovery Status</span>

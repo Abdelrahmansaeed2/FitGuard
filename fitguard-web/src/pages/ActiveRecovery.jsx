@@ -3,7 +3,8 @@ import { useRecoveryStore } from '../store/recoveryStore';
 import { Link } from 'react-router-dom';
 
 export default function ActiveRecovery() {
-  const { activeProtocol, loading, error, fetchActiveProtocol, completePhase } = useRecoveryStore();
+  const { activeProtocol, loading, error, fetchActiveProtocol, completePhase, toggleExercise } = useRecoveryStore();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
@@ -42,8 +43,13 @@ export default function ActiveRecovery() {
     );
   }
 
-  const handleCompletePhase = async () => {
+  const handleCompletePhaseClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmPhase = async () => {
     await completePhase(activeProtocol._id || activeProtocol.id, activeProtocol.currentPhase);
+    setShowConfirmModal(false);
     setShowSuccessModal(true);
   };
 
@@ -64,8 +70,9 @@ export default function ActiveRecovery() {
           <p className="font-body-lg text-body-lg text-on-surface-variant mt-1">{currentPhaseData?.name} • Moderate Load Phase</p>
         </div>
         <button 
-          onClick={handleCompletePhase}
-          className="bg-primary hover:bg-on-primary-container text-on-primary font-label-md text-label-md py-3 px-6 rounded-lg shadow-sm transition-colors flex items-center space-x-2"
+          onClick={handleCompletePhaseClick}
+          disabled={!currentPhaseData?.exercises?.every(ex => ex.completed)}
+          className="bg-primary hover:bg-on-primary-container text-on-primary font-label-md text-label-md py-3 px-6 rounded-lg shadow-sm transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined">check_circle</span>
           <span>Complete Phase</span>
@@ -145,10 +152,17 @@ export default function ActiveRecovery() {
             </div>
             <div className="space-y-3">
               {currentPhaseData?.exercises.map((exercise, idx) => (
-                <label key={idx} className="flex items-center p-4 rounded-lg border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors group">
-                  <input type="checkbox" className="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface mr-4" />
+                <label key={exercise._id || exercise.id || idx} className="flex items-center p-4 rounded-lg border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors group">
+                  <input 
+                    type="checkbox" 
+                    checked={exercise.completed || false}
+                    onChange={() => toggleExercise(activeProtocol.id || activeProtocol._id, activeProtocol.currentPhase, exercise.id || exercise._id)}
+                    className="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface mr-4" 
+                  />
                   <div className="flex-grow">
-                    <span className="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">{exercise.name || exercise}</span>
+                    <span className={`font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors ${exercise.completed ? 'line-through opacity-60' : ''}`}>
+                      {exercise.title || exercise.name || exercise}
+                    </span>
                     {exercise.sets && <span className="block font-body-sm text-body-sm text-on-surface-variant">{exercise.sets} sets x {exercise.reps}</span>}
                   </div>
                   <span className="material-symbols-outlined text-outline-variant group-hover:text-primary">fitness_center</span>
@@ -220,6 +234,35 @@ export default function ActiveRecovery() {
         </div>
       </div>
 
+      {/* Confirm Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-on-background bg-opacity-50 backdrop-blur-sm">
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-xl p-8 max-w-sm w-full mx-4 text-center transform transition-all scale-100 opacity-100">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-secondary-container mb-6">
+              <span className="material-symbols-outlined text-on-secondary-container text-4xl">help</span>
+            </div>
+            <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Complete Phase?</h3>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">
+              Are you sure you want to mark this phase as complete? You will not be able to undo this action.
+            </p>
+            <div className="flex flex-col space-y-3">
+              <button 
+                onClick={handleConfirmPhase}
+                className="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-on-primary-container transition-colors"
+              >
+                Confirm Completion
+              </button>
+              <button 
+                onClick={() => setShowConfirmModal(false)}
+                className="w-full bg-transparent border border-outline-variant text-on-surface font-label-md text-label-md py-3 rounded-lg hover:bg-surface-container-low transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-on-background bg-opacity-50 backdrop-blur-sm">
@@ -229,23 +272,17 @@ export default function ActiveRecovery() {
             </div>
             <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Phase Completed</h3>
             <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">
-              Excellent work. Phase 2 data has been logged. Preparing Remodeling protocols for tomorrow.
+              Excellent work. Phase {activeProtocol.currentPhase} data has been logged.
             </p>
             <div className="flex flex-col space-y-3">
-              <button 
-                onClick={() => setShowSuccessModal(false)}
-                className="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-on-primary-container transition-colors"
-              >
-                View Next Phase
-              </button>
               <button 
                 onClick={() => {
                   setShowSuccessModal(false);
                   fetchActiveProtocol();
                 }}
-                className="w-full bg-transparent border border-outline-variant text-on-surface font-label-md text-label-md py-3 rounded-lg hover:bg-surface-container-low transition-colors"
+                className="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-on-primary-container transition-colors"
               >
-                Dismiss
+                Continue
               </button>
             </div>
           </div>

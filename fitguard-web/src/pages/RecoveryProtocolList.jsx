@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { useRecoveryStore } from '../store/recoveryStore';
 
 export default function RecoveryProtocolList() {
-  const { activeProtocol, fetchActiveProtocol, loading } = useRecoveryStore();
+  const { protocols, activeProtocol, fetchProtocols, fetchActiveProtocol, loading } = useRecoveryStore();
 
   useEffect(() => {
+    fetchProtocols();
     fetchActiveProtocol();
   } // eslint-disable-next-line react-hooks/exhaustive-deps
   , []);
@@ -27,9 +28,6 @@ export default function RecoveryProtocolList() {
               <p className="font-body-lg text-body-lg text-on-surface-variant mt-1">Active Rehabilitation Phase</p>
             </div>
             <div className="flex space-x-3">
-              <button className="px-4 py-2 border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors">
-                Protocol History
-              </button>
               <Link to="/recovery/generate" className="px-4 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center space-x-2">
                 <span className="material-symbols-outlined text-[18px]">edit_document</span>
                 <span>Adjust Protocol</span>
@@ -141,6 +139,58 @@ export default function RecoveryProtocolList() {
           </Link>
         </div>
       ) : null}
+
+      {/* Protocol History Section */}
+      <div className="mt-12">
+        <h3 className="font-headline-md text-headline-md text-on-surface mb-6">Protocol History</h3>
+        
+        {protocols.length === 0 ? (
+          <p className="text-on-surface-variant text-center bg-surface-container-lowest p-8 rounded-xl border border-outline-variant">No protocols recorded yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {protocols.map(protocol => (
+              <div key={protocol.id || protocol._id} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-4">
+                  <h4 className="font-headline-sm text-headline-sm text-on-surface capitalize">{protocol.injuryLogId?.muscleGroup || 'Recovery'} Protocol</h4>
+                  <span className={`px-2 py-1 rounded text-label-md font-label-md ${protocol.status === 'active' ? 'bg-secondary-container text-secondary' : 'bg-surface-variant text-on-surface-variant'}`}>
+                    {protocol.status}
+                  </span>
+                </div>
+                
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between font-body-sm text-body-sm">
+                    <span className="text-on-surface-variant">Goal</span>
+                    <span className="text-on-surface font-medium capitalize text-right ml-4 line-clamp-1">{protocol.goal || 'General Rehabilitation'}</span>
+                  </div>
+                  <div className="flex justify-between font-body-sm text-body-sm">
+                    <span className="text-on-surface-variant">Target</span>
+                    <span className="text-on-surface font-medium capitalize">{protocol.target || 'Full Recovery'}</span>
+                  </div>
+                  <div className="flex justify-between font-body-sm text-body-sm">
+                    <span className="text-on-surface-variant">Current Phase</span>
+                    <span className="text-on-surface font-medium">{protocol.currentPhase} / {protocol.phases?.length || 0}</span>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-outline-variant space-y-2">
+                  {protocol.endDate && (
+                    <div className="flex justify-between font-label-md text-label-md text-on-surface-variant">
+                      <span>Target End Date</span>
+                      <span>{new Date(protocol.endDate).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  {protocol.completedAt && (
+                    <div className="flex justify-between font-label-md text-label-md text-on-surface-variant">
+                      <span>Completed At</span>
+                      <span className="text-primary">{new Date(protocol.completedAt).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

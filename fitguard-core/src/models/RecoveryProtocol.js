@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const exerciseSchema = require('./Exercise');
 
 const recoveryPhaseSchema = new mongoose.Schema({
   phaseNumber: {
@@ -14,8 +15,8 @@ const recoveryPhaseSchema = new mongoose.Schema({
     required: true
   },
   exercises: {
-    type: [String],
-    required: true
+    type: [exerciseSchema],
+    default: []
   },
   completed: {
     type: Boolean,

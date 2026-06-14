@@ -107,19 +107,33 @@ export default function ChallengeHistory() {
             </div>
             <div className="p-5">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-headline-sm font-headline-sm text-on-background line-clamp-1">{challenge.title}</h3>
+                <h3 className="text-headline-sm font-headline-sm text-on-background line-clamp-1 capitalize">{challenge.sport} Challenge</h3>
               </div>
-              <p className="text-body-sm font-body-sm text-on-surface-variant mb-4 line-clamp-2">{challenge.description}</p>
+              <p className="text-body-sm font-body-sm text-on-surface-variant mb-4 line-clamp-2 capitalize">{challenge.difficulty} Difficulty Level</p>
               <div className="mb-4">
                 <div className="flex justify-between text-label-md font-label-md mb-1">
-                  <span className="text-on-surface-variant">Target</span>
-                  <span className="text-primary font-mono-data">{challenge.targetVelocity || 'N/A'}</span>
+                  <span className="text-on-surface-variant">Status</span>
+                  <span className="text-primary font-mono-data capitalize">{challenge.status || 'N/A'}</span>
                 </div>
+                <div className="flex justify-between text-label-md font-label-md mb-1">
+                  <span className="text-on-surface-variant">Duration</span>
+                  <span className="text-on-surface font-mono-data">{challenge.generatedPlan?.length || 0} Days</span>
+                </div>
+                <div className="flex justify-between text-label-md font-label-md mb-1">
+                  <span className="text-on-surface-variant">Progress</span>
+                  <span className="text-on-surface font-mono-data">{challenge.generatedPlan?.filter(d => d.completed).length || 0} / {challenge.generatedPlan?.length || 0} Days</span>
+                </div>
+                {challenge.completedAt && (
+                  <div className="flex justify-between text-label-md font-label-md mb-1">
+                    <span className="text-on-surface-variant">Completed At</span>
+                    <span className="text-on-surface font-mono-data">{new Date(challenge.completedAt).toLocaleDateString()}</span>
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-between border-t border-surface-container pt-4">
                 <div className="text-label-md font-label-md text-on-surface-variant flex items-center gap-1">
                   <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>calendar_today</span>
-                  {new Date(challenge.date).toLocaleDateString()}
+                  Created At: {new Date(challenge.createdAt).toLocaleDateString()}
                 </div>
                 <button className="text-primary hover:text-primary-container transition-colors">
                   <span className="material-symbols-outlined">arrow_forward</span>

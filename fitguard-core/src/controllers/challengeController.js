@@ -170,9 +170,12 @@ exports.completeDay = async (req, res, next) => {
     dayObj.completed = true;
     dayObj.completedAt = new Date();
 
+    challenge.markModified('generatedPlan');
+
     const allCompleted = challenge.generatedPlan.every(d => d.completed);
     if (allCompleted) {
       challenge.status = 'completed';
+      challenge.completedAt = new Date();
     }
 
     await challenge.save();
@@ -221,6 +224,42 @@ exports.abandonChallenge = async (req, res, next) => {
       success: true,
       data: challenge,
       message: 'Challenge abandoned successfully'
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.toggleExercise = async (req, res, next) => {
+  try {
+    const { id, dayNumber, exerciseId } = req.params;
+    const dayVal = parseInt(dayNumber, 10);
+
+    const challenge = await Challenge.findOne({ _id: id, userId: req.user._id });
+    if (!challenge) {
+      return res.status(404).json({ success: false, data: null, message: 'Challenge not found' });
+    }
+
+    const dayObj = challenge.generatedPlan.find(d => d.day === dayVal);
+    if (!dayObj) {
+      return res.status(404).json({ success: false, data: null, message: 'Day not found' });
+    }
+
+    const exercise = dayObj.exercises.id(exerciseId);
+    if (!exercise) {
+      return res.status(404).json({ success: false, data: null, message: 'Exercise not found' });
+    }
+
+    exercise.completed = !exercise.completed;
+    exercise.completedAt = exercise.completed ? new Date() : null;
+
+    challenge.markModified('generatedPlan');
+    await challenge.save();
+
+    res.status(200).json({
+      success: true,
+      data: challenge,
+      message: 'Exercise toggled successfully'
     });
   } catch (err) {
     next(err);
