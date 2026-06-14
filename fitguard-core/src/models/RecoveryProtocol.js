@@ -46,6 +46,17 @@ const recoveryProtocolSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  endDate: {
+    type: Date
+  },
+  goal: {
+    type: String,
+    required: false
+  },
+  target: {
+    type: String,
+    required: false
+  },
   status: {
     type: String,
     enum: ['active', 'completed'],

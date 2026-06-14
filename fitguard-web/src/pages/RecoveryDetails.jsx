@@ -56,7 +56,7 @@ export default function RecoveryDetails() {
               <span className="material-symbols-outlined mr-2 text-primary">timeline</span>
               12-Week Trajectory
             </h3>
-            <span className="font-mono-data text-mono-data text-on-surface-variant hidden md:block">Estimated Full Clearence: Oct 14</span>
+            <span className="font-mono-data text-mono-data text-on-surface-variant hidden md:block">Estimated Full Clearance: {protocol.endDate ? new Date(protocol.endDate).toLocaleDateString() : 'Pending'}</span>
           </div>
           <div className="relative w-full h-32 flex items-center justify-between px-4 overflow-x-auto pb-4 md:pb-0">
             {/* Connecting Line */}
@@ -139,39 +139,17 @@ export default function RecoveryDetails() {
             {/* Target 1 */}
             <div>
               <div className="flex justify-between font-label-md text-label-md mb-2">
-                <span className="text-on-surface">Knee Flexion ROM</span>
-                <span className="font-mono-data text-primary">90°</span>
+                <span className="text-on-surface">Primary Goal</span>
               </div>
-              <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
-                <div className="bg-primary h-full rounded-full" style={{ width: '45%' }}></div>
-              </div>
-              <p className="font-mono-data text-[10px] text-on-surface-variant mt-1 text-right">Current: 40°</p>
+              <p className="font-body-md text-on-surface-variant">{protocol.goal || 'Return to play'}</p>
             </div>
             
             {/* Target 2 */}
-            <div>
+            <div className="pt-4 border-t border-surface-container">
               <div className="flex justify-between font-label-md text-label-md mb-2">
-                <span className="text-on-surface">Quad Activation</span>
-                <span className="font-mono-data text-primary">Voluntary SLR</span>
+                <span className="text-on-surface">Biometric Target</span>
               </div>
-              <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
-                <div className="bg-surface-variant h-full rounded-full w-full relative">
-                  <div className="absolute left-[20%] top-0 bottom-0 w-[2px] bg-error"></div>
-                </div>
-              </div>
-              <p className="font-mono-data text-[10px] text-error mt-1 text-right">Lag Present</p>
-            </div>
-            
-            {/* Target 3 */}
-            <div>
-              <div className="flex justify-between font-label-md text-label-md mb-2">
-                <span className="text-on-surface">Pain Scale (Avg)</span>
-                <span className="font-mono-data text-primary">&lt; 4/10</span>
-              </div>
-              <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
-                <div className="bg-tertiary h-full rounded-full" style={{ width: '60%' }}></div>
-              </div>
-              <p className="font-mono-data text-[10px] text-on-surface-variant mt-1 text-right">Current: 6/10</p>
+              <p className="font-body-md text-on-surface-variant">{protocol.target || 'Restore full mobility'}</p>
             </div>
           </div>
           

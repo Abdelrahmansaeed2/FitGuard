@@ -40,7 +40,7 @@ export default function Sidebar() {
         </Link>
         <Link className={getLinkClasses('/challenges')} to="/challenges">
           <span className="material-symbols-outlined" style={getIconFill('/challenges')}>analytics</span>
-          <span className="font-label-md text-label-md">Reports</span>
+          <span className="font-label-md text-label-md">Challenges</span>
         </Link>
         <Link className={getLinkClasses('/settings')} to="/settings">
           <span className="material-symbols-outlined" style={getIconFill('/settings')}>settings</span>

@@ -53,12 +53,19 @@ exports.generateProtocol = async (req, res, next) => {
       completed: false
     }));
 
+    const startDate = new Date();
+    const totalDays = phases.reduce((sum, p) => sum + (p.durationDays || 0), 0);
+    const endDate = new Date(startDate.getTime() + totalDays * 24 * 60 * 60 * 1000);
+
     const protocol = new RecoveryProtocol({
       userId: user._id,
       injuryLogId,
       phases,
       currentPhase: 1,
-      startDate: new Date(),
+      startDate: startDate,
+      endDate: endDate,
+      goal: aiResult.goal || 'Return to play safely',
+      target: aiResult.target || 'Full mobility and strength',
       status: 'active'
     });
 

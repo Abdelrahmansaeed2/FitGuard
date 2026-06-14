@@ -141,7 +141,7 @@ export default function ActiveRecovery() {
                 <span className="material-symbols-outlined mr-2 text-primary">task_alt</span>
                 Today's Protocol
               </h3>
-              <span className="font-mono-data text-mono-data text-on-surface-variant">Oct 24, 2024</span>
+              <span className="font-mono-data text-mono-data text-on-surface-variant">{new Date().toLocaleDateString()}</span>
             </div>
             <div className="space-y-3">
               {currentPhaseData?.exercises.map((exercise, idx) => (

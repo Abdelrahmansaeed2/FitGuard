@@ -83,7 +83,7 @@ export default function InjuryEdit() {
       {/* Breadcrumb & Header */}
       <div className="mb-8">
         <div className="flex items-center text-body-sm text-on-surface-variant mb-4 space-x-2">
-          <Link className="hover:text-primary transition-colors" to="/injuries">Reports</Link>
+          <Link className="hover:text-primary transition-colors" to="/injuries">Injuries</Link>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
           <Link className="hover:text-primary transition-colors" to="/injuries">Injury Log</Link>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>

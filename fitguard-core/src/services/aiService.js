@@ -72,6 +72,8 @@ CRITICAL Rehab RULES:
 
 Expected JSON schema:
 {
+  "goal": "Return to play within 6 weeks",
+  "target": "Full range of motion and weight bearing",
   "phases": [
     {
       "phaseNumber": 1,
@@ -154,6 +156,8 @@ function generateMockRecoveryProtocol(injuryLog, context) {
   const type = injuryLog.injuryType || 'injury';
 
   return {
+    goal: `Return to full sport performance safely`,
+    target: `Restore 100% ${muscle} mobility and strength`,
     phases: [
       {
         phaseNumber: 1,
