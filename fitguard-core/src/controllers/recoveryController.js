@@ -179,28 +179,33 @@ exports.completePhase = async (req, res, next) => {
       });
     }
 
-    phase.completed = true;
+    await RecoveryProtocol.updateOne(
+      { _id: id, userId: req.user._id, "phases.phaseNumber": phaseVal },
+      { $set: { "phases.$.completed": true } }
+    );
 
-    const allCompleted = protocol.phases.every(p => p.completed);
+    const updatedProtocol = await RecoveryProtocol.findOne({ _id: id, userId: req.user._id });
+
+    const allCompleted = updatedProtocol.phases.every(p => p.completed);
 
     if (allCompleted) {
-      protocol.status = 'completed';
+      updatedProtocol.status = 'completed';
       await InjuryLog.updateOne(
-        { _id: protocol.injuryLogId },
+        { _id: updatedProtocol.injuryLogId },
         { $set: { recoveryStatus: 'recovered' } }
       );
     } else {
-      const nextPhase = protocol.phases.find(p => !p.completed);
+      const nextPhase = updatedProtocol.phases.find(p => !p.completed);
       if (nextPhase) {
-        protocol.currentPhase = nextPhase.phaseNumber;
+        updatedProtocol.currentPhase = nextPhase.phaseNumber;
       }
     }
 
-    await protocol.save();
+    await updatedProtocol.save();
 
     let msg = `Phase ${phaseVal} of your recovery protocol completed.`;
-    if (protocol.status === 'completed') {
-      const injuryLogObj = await InjuryLog.findById(protocol.injuryLogId);
+    if (updatedProtocol.status === 'completed') {
+      const injuryLogObj = await InjuryLog.findById(updatedProtocol.injuryLogId);
       const muscle = injuryLogObj ? injuryLogObj.muscleGroup : 'injured area';
       msg = `Excellent work! You completed all recovery phases for your ${muscle}. Injury marked as recovered.`;
     }
@@ -214,8 +219,8 @@ exports.completePhase = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: protocol,
-      message: protocol.status === 'completed'
+      data: updatedProtocol,
+      message: updatedProtocol.status === 'completed'
         ? 'All phases completed! Injury recovered!'
         : `Phase ${phaseVal} marked as complete`
     });

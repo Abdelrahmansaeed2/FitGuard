@@ -84,3 +84,4 @@ out/
 uploads/
 fitguard-core/uploads/
 audit_results.json
+test_recovery.js

@@ -46,13 +46,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rate Limiting
-const limiter = rateLimit({
+const isDev = process.env.NODE_ENV === 'development';
+const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  max: isDev ? 10000 : 500, // Very high limit in dev, 500 in prod
   standardHeaders: true,
   legacyHeaders: false,
+  message: { success: false, message: 'Too many API requests, please try again later.' }
 });
-app.use('/api', limiter);
+app.use('/api', apiLimiter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const authRoutes = require('./src/routes/authRoutes');
