@@ -31,6 +31,19 @@ exports.generateChallenge = async (req, res, next) => {
     const generatedPlan = aiResult.days.map(d => ({
       day: d.day,
       task: d.task,
+      exercises: (d.exercises || []).map(ex => {
+        if (typeof ex === 'string') {
+          return { title: ex, completed: false };
+        }
+        return {
+          title: ex.title || 'Exercise',
+          description: ex.description || '',
+          sets: typeof ex.sets === 'number' ? ex.sets : null,
+          reps: typeof ex.reps === 'number' ? ex.reps : null,
+          duration: ex.duration || null,
+          completed: ex.completed || false
+        };
+      }),
       muscleGroups: d.muscleGroups || [],
       difficulty: d.difficulty || difficulty,
       completed: false
