@@ -131,3 +131,29 @@ Protected: Yes
 
 ### DELETE /api/notifications/:id
 Protected: Yes
+
+---
+
+## Exercises
+
+### POST /api/exercises
+Protected: Yes
+Body: { title, description, sets, reps, duration, notes }
+Response: { success, data: { exercise }, message }
+
+### GET /api/exercises
+Protected: Yes
+Response: { success, data: [ exercises ], total, message }
+
+### GET /api/exercises/:id
+Protected: Yes
+Response: { success, data: { exercise }, message }
+
+### PUT /api/exercises/:id
+Protected: Yes
+Body: any of { title, description, sets, reps, duration, completed, notes }
+Response: { success, data: { exercise }, message }
+
+### DELETE /api/exercises/:id
+Protected: Yes
+Response: { success, data: {}, message }

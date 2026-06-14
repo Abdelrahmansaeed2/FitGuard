@@ -65,6 +65,7 @@ const recoveryRoutes = require('./src/routes/recoveryRoutes');
 const notificationRoutes = require('./src/routes/notificationRoutes');
 const dashboardRoutes = require('./src/routes/dashboardRoutes');
 const uploadRoutes = require('./src/routes/uploadRoutes');
+const exerciseRoutes = require('./src/routes/exerciseRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -74,6 +75,7 @@ app.use('/api/recovery', recoveryRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/exercises', exerciseRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({
