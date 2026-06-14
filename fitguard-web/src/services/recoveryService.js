@@ -19,5 +19,10 @@ export const recoveryService = {
   completeRecoveryPhase: async (id, phaseNumber) => {
     const response = await apiClient.put(`/recovery/${id}/phase/${phaseNumber}/complete`);
     return response.data;
+  },
+
+  getRecoveryById: async (id) => {
+    const response = await apiClient.get(`/recovery/${id}`);
+    return response.data;
   }
 };

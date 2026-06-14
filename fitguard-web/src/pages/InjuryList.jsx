@@ -7,7 +7,8 @@ export default function InjuryList() {
 
   useEffect(() => {
     fetchInjuries();
-  }, []);
+  } // eslint-disable-next-line react-hooks/exhaustive-deps
+  , []);
 
   const getSeverityColors = (severity) => {
     switch(severity?.toLowerCase()) {
@@ -53,7 +54,7 @@ export default function InjuryList() {
           if (isSevere && index === 0) {
             // Hero Card Layout
             return (
-              <div key={injury.id} className="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 hover:border-outline transition-colors group cursor-pointer flex flex-col md:flex-row gap-6 relative overflow-hidden">
+              <Link to={`/injuries/${injury.id}`} key={injury.id} className="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 hover:border-outline transition-colors group cursor-pointer flex flex-col md:flex-row gap-6 relative overflow-hidden">
                 <div className={`absolute left-0 top-0 bottom-0 w-1 ${injury.severity?.toLowerCase() === 'high' ? 'bg-error' : 'bg-primary'}`}></div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-4">
@@ -83,12 +84,12 @@ export default function InjuryList() {
                   <p className="font-label-md text-[10px] text-on-surface-variant uppercase tracking-wider relative z-10">Pain Index Trend</p>
                   <p className="font-headline-sm text-headline-sm text-tertiary relative z-10 mt-1">Tracking</p>
                 </div>
-              </div>
+              </Link>
             );
           }
 
           return (
-            <div key={injury.id} className="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 hover:border-outline hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all cursor-pointer group flex flex-col">
+            <Link to={`/injuries/${injury.id}`} key={injury.id} className="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 hover:border-outline hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all cursor-pointer group flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-2">
                   <span className={`${getSeverityColors(injury.severity)} font-label-md text-[10px] px-2 py-1 rounded-full uppercase tracking-wider`}>{injury.severity}</span>
@@ -106,7 +107,7 @@ export default function InjuryList() {
                   <div className="bg-primary h-1.5 rounded-full" style={{ width: '45%' }}></div>
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
 

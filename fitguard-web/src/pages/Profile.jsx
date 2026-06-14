@@ -7,7 +7,8 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  } // eslint-disable-next-line react-hooks/exhaustive-deps
+  , []);
 
   if (loading && !profile) {
     return <div className="p-8 text-center text-on-surface-variant">Loading profile...</div>;

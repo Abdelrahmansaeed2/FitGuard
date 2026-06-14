@@ -3,6 +3,7 @@ const InjuryLog = require('../models/InjuryLog');
 const Notification = require('../models/Notification');
 const aiService = require('../services/aiService');
 const { getInjuryAIContext } = require('../utils/injuryPatterns');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.generateProtocol = async (req, res, next) => {
   try {
@@ -82,13 +83,19 @@ exports.generateProtocol = async (req, res, next) => {
 
 exports.getProtocols = async (req, res, next) => {
   try {
-    const protocols = await RecoveryProtocol.find({ userId: req.user._id })
-      .populate('injuryLogId')
-      .sort({ createdAt: -1 });
+    const features = new APIFeatures(RecoveryProtocol.find({ userId: req.user._id }).populate('injuryLogId'), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    const protocols = await features.query;
+    const total = await RecoveryProtocol.countDocuments({ userId: req.user._id, ...features.query.getQuery() });
 
     res.status(200).json({
       success: true,
       data: protocols,
+      total,
       message: 'Recovery protocols retrieved successfully'
     });
   } catch (err) {
@@ -105,6 +112,28 @@ exports.getActiveProtocols = async (req, res, next) => {
       success: true,
       data: protocols,
       message: 'Active recovery protocols retrieved successfully'
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getProtocolById = async (req, res, next) => {
+  try {
+    const protocol = await RecoveryProtocol.findOne({ _id: req.params.id, userId: req.user._id })
+      .populate('injuryLogId');
+    if (!protocol) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: 'Recovery protocol not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: protocol,
+      message: 'Recovery protocol retrieved successfully'
     });
   } catch (err) {
     next(err);

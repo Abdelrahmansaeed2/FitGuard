@@ -1,6 +1,20 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useChallengeStore } from '../store/challengeStore';
 
 export default function ChallengeDetails() {
+  const { id } = useParams();
+  const { fetchChallengeById } = useChallengeStore();
+  const [challenge, setChallenge] = useState(null);
+
+  useEffect(() => {
+    fetchChallengeById(id).then(setChallenge);
+  }, [id, fetchChallengeById]);
+
+  if (!challenge) {
+    return <div className="p-8 text-center text-on-surface-variant">Loading challenge details...</div>;
+  }
+
   return (
     <div className="p-8 lg:p-12 w-full max-w-container-max mx-auto">
       {/* Header Section */}
@@ -12,13 +26,15 @@ export default function ChallengeDetails() {
               <span className="material-symbols-outlined text-[16px]">schedule</span> 30 Days
             </span>
           </div>
-          <h2 className="font-display-md text-display-md text-on-surface">Patellar Resilience Protocol</h2>
-          <p className="font-body-lg text-body-lg text-on-surface-variant mt-2 max-w-2xl">Your custom 30-day AI-generated plan focusing on controlled load management and tissue remodeling.</p>
+          <h2 className="font-display-md text-display-md text-on-surface capitalize">{challenge.sport} Resilience Protocol</h2>
+          <p className="font-body-lg text-body-lg text-on-surface-variant mt-2 max-w-2xl">Your custom 30-day AI-generated plan focusing on controlled load management and tissue remodeling. Difficulty: <span className="capitalize">{challenge.difficulty}</span></p>
         </div>
-        <Link to="/challenges/active" className="bg-secondary text-on-secondary font-label-md text-label-md px-8 py-4 rounded-xl shadow-sm hover:shadow-md hover:bg-secondary/90 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-          Start Challenge
-        </Link>
+        {challenge.status === 'active' && (
+          <Link to="/challenges/active" className="bg-secondary text-on-secondary font-label-md text-label-md px-8 py-4 rounded-xl shadow-sm hover:shadow-md hover:bg-secondary/90 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+            Continue Challenge
+          </Link>
+        )}
       </div>
 
       {/* Bento Grid Overview */}
@@ -102,101 +118,30 @@ export default function ChallengeDetails() {
         </div>
 
         <div className="space-y-8">
-          {/* Week 1 Group */}
-          <div>
-            <h4 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-4">Week 1: Foundations</h4>
-            <div className="flex overflow-x-auto hide-scrollbar gap-4 pb-4">
-              {/* Day Card */}
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 01</p>
-                <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-[18px]">self_improvement</span>
+          {[0, 1, 2, 3].map(weekIndex => {
+            const weekDays = challenge.generatedPlan.slice(weekIndex * 7, (weekIndex + 1) * 7);
+            if (weekDays.length === 0) return null;
+            return (
+              <div key={weekIndex}>
+                <h4 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-4">Week {weekIndex + 1}</h4>
+                <div className="flex overflow-x-auto hide-scrollbar gap-4 pb-4">
+                  {weekDays.map((dayObj) => (
+                    <div key={dayObj.day} className={`min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group ${dayObj.completed ? 'opacity-60 border-primary' : ''}`}>
+                      <p className="font-mono-data text-mono-data text-on-surface-variant mb-2 flex justify-between">
+                        <span>Day {dayObj.day.toString().padStart(2, '0')}</span>
+                        {dayObj.completed && <span className="material-symbols-outlined text-primary text-[14px]">check_circle</span>}
+                      </p>
+                      <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <span className="material-symbols-outlined text-[18px]">fitness_center</span>
+                      </div>
+                      <p className="font-label-md text-label-md text-on-surface line-clamp-1">{dayObj.task}</p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px] capitalize">{dayObj.muscleGroups?.join(', ')}</p>
+                    </div>
+                  ))}
                 </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">Isometric Hold</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">45s x 5 Sets</p>
               </div>
-
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 02</p>
-                <div className="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-[18px]">bed</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">Active Rest</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">Mobility Flow</p>
-              </div>
-
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 03</p>
-                <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-[18px]">fitness_center</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">Isometric Hold</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">45s x 5 Sets</p>
-              </div>
-
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 04</p>
-                <div className="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-[18px]">pool</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">Hydrotherapy</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">20 mins</p>
-              </div>
-
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 05</p>
-                <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-[18px]">fitness_center</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">HSR Intro</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">Light Load</p>
-              </div>
-
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group opacity-50">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 06</p>
-                <div className="w-8 h-8 rounded-full bg-surface-variant border border-dashed border-outline text-on-surface-variant flex items-center justify-center mb-3">
-                  <span className="material-symbols-outlined text-[18px]">night_shelter</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">Full Rest</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">0 Load</p>
-              </div>
-
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 07</p>
-                <div className="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-[18px]">monitor_heart</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">Baseline Test</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">Pain Logging</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Week 2 Group (Abbreviated visual) */}
-          <div>
-            <h4 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-4">Week 2: Heavy Slow Resistance</h4>
-            <div className="flex overflow-x-auto hide-scrollbar gap-4 pb-4">
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 08</p>
-                <div className="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center mb-3">
-                  <span className="material-symbols-outlined text-[18px]">fitness_center</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">HSR Squats</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">4x8 @ 70% 1RM</p>
-              </div>
-              <div className="min-w-[140px] flex-shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors cursor-pointer group">
-                <p className="font-mono-data text-mono-data text-on-surface-variant mb-2">Day 09</p>
-                <div className="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center mb-3">
-                  <span className="material-symbols-outlined text-[18px]">directions_run</span>
-                </div>
-                <p className="font-label-md text-label-md text-on-surface line-clamp-1">Light Flush</p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 text-[11px]">Z1 Bike 30m</p>
-              </div>
-              <div className="min-w-[140px] flex-shrink-0 border border-dashed border-outline-variant rounded-xl p-4 flex items-center justify-center text-outline-variant bg-surface-container/30">
-                <span className="font-label-md text-label-md">Scroll for more</span>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
     </div>

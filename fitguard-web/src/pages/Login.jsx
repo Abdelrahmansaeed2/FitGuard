@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import apiClient from '../services/apiClient';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),

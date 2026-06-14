@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useInjuryStore } from '../store/injuryStore';
 import { useRecoveryStore } from '../store/recoveryStore';
 
 const generateSchema = z.object({
-  difficulty: z.enum(['light', 'moderate', 'intensive'], { required_error: 'Intensity level is required' })
+  injuryLogId: z.string().min(1, 'Please select an injury to generate a protocol for')
 });
 
 export default function RecoveryGenerate() {
@@ -14,13 +15,15 @@ export default function RecoveryGenerate() {
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   const [serverError, setServerError] = useState('');
   const navigate = useNavigate();
+  const { injuries, fetchInjuries } = useInjuryStore();
   const { generateProtocol } = useRecoveryStore();
 
+  useEffect(() => {
+    fetchInjuries();
+  }, [fetchInjuries]);
+
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(generateSchema),
-    defaultValues: {
-      difficulty: 'moderate'
-    }
+    resolver: zodResolver(generateSchema)
   });
 
   const loadingMessages = [
@@ -52,7 +55,7 @@ export default function RecoveryGenerate() {
       // Align payload exactly with what the UI provides (difficulty)
       // or what is supported by the contract (removed the hallucinated fields)
       await generateProtocol(data);
-      navigate('/recovery/1'); // Route to active protocol
+      navigate('/recovery/active');
     } catch (err) {
       setServerError(err.response?.data?.message || 'Failed to generate protocol.');
       setIsGenerating(false);
@@ -76,38 +79,29 @@ export default function RecoveryGenerate() {
               <span className="font-body-sm text-body-sm">{serverError}</span>
             </div>
           )}
-          {errors.difficulty && (
-            <p className="text-error text-label-md mb-4 text-center">{errors.difficulty.message}</p>
+          {errors.injuryLogId && (
+            <p className="text-error text-label-md mb-4 text-center">{errors.injuryLogId.message}</p>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {/* Light */}
-            <label className="cursor-pointer relative">
-              <input className="peer sr-only" type="radio" value="light" {...register('difficulty')} />
-              <div className="p-6 border border-outline-variant rounded-xl hover:border-outline peer-checked:border-primary peer-checked:bg-surface-container-low transition-all h-full flex flex-col">
-                <span className="material-symbols-outlined text-primary mb-2">self_improvement</span>
-                <span className="font-headline-sm text-headline-sm block mb-1">Light Restorative</span>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">Focus on passive mobility and deep rest.</span>
-              </div>
-            </label>
-            {/* Moderate */}
-            <label className="cursor-pointer relative">
-              <input className="peer sr-only" type="radio" value="moderate" {...register('difficulty')} />
-              <div className="p-6 border border-outline-variant rounded-xl hover:border-outline peer-checked:border-primary peer-checked:bg-surface-container-low transition-all h-full flex flex-col">
-                <span className="material-symbols-outlined text-primary mb-2">directions_walk</span>
-                <span className="font-headline-sm text-headline-sm block mb-1">Active Recovery</span>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">Balanced mix of light strain and guided rest.</span>
-              </div>
-            </label>
-            {/* Intensive */}
-            <label className="cursor-pointer relative">
-              <input className="peer sr-only" type="radio" value="intensive" {...register('difficulty')} />
-              <div className="p-6 border border-outline-variant rounded-xl hover:border-outline peer-checked:border-primary peer-checked:bg-surface-container-low transition-all h-full flex flex-col">
-                <span className="material-symbols-outlined text-primary mb-2">fitness_center</span>
-                <span className="font-headline-sm text-headline-sm block mb-1">Load Reintroduction</span>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">Progressive loading for peak adaptation.</span>
-              </div>
-            </label>
+          <div className="flex flex-col gap-4 mb-8 max-h-[300px] overflow-y-auto pr-2">
+            {injuries.length === 0 ? (
+              <p className="text-center text-on-surface-variant font-body-sm">No injuries logged. You must log an injury first to generate a recovery protocol.</p>
+            ) : (
+              injuries.map(injury => (
+                <label key={injury.id} className="cursor-pointer relative">
+                  <input className="peer sr-only" type="radio" value={injury.id} {...register('injuryLogId')} />
+                  <div className="p-4 border border-outline-variant rounded-xl hover:border-outline peer-checked:border-primary peer-checked:bg-surface-container-low transition-all flex items-center justify-between">
+                    <div>
+                      <span className="font-headline-sm text-headline-sm block mb-1 capitalize">{injury.muscleGroup} - {injury.injuryType}</span>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">Logged on {new Date(injury.dateOccurred).toLocaleDateString()}</span>
+                    </div>
+                    {injury.recoveryStatus === 'recovered' && (
+                      <span className="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-[10px] font-mono-data uppercase">Recovered</span>
+                    )}
+                  </div>
+                </label>
+              ))
+            )}
           </div>
           <button 
             type="submit"

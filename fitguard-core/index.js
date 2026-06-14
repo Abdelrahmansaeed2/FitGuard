@@ -1,6 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./src/config/db');
 const errorHandler = require('./src/middleware/errorHandler');
 
@@ -35,8 +38,22 @@ const corsOptions = {
   credentials: true
 };
 
+// Middlewares
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', limiter);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
@@ -44,6 +61,8 @@ const injuryRoutes = require('./src/routes/injuryRoutes');
 const challengeRoutes = require('./src/routes/challengeRoutes');
 const recoveryRoutes = require('./src/routes/recoveryRoutes');
 const notificationRoutes = require('./src/routes/notificationRoutes');
+const dashboardRoutes = require('./src/routes/dashboardRoutes');
+const uploadRoutes = require('./src/routes/uploadRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -51,6 +70,8 @@ app.use('/api/injuries', injuryRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/recovery', recoveryRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({

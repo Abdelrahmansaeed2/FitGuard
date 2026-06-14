@@ -1,6 +1,19 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useInjuryStore } from '../store/injuryStore';
 
 export default function InjuryDetails() {
+  const { id } = useParams();
+  const { selectedInjury, fetchInjury, loading } = useInjuryStore();
+
+  useEffect(() => {
+    fetchInjury(id);
+  }, [id, fetchInjury]);
+
+  if (loading || !selectedInjury) {
+    return <div className="p-8 text-center text-on-surface-variant">Loading injury details...</div>;
+  }
+
   return (
     <div className="flex-1 p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
       {/* Breadcrumbs & Actions */}
@@ -9,15 +22,15 @@ export default function InjuryDetails() {
           <div className="flex items-center space-x-2 text-body-sm text-on-surface-variant mb-2">
             <Link className="hover:text-primary transition-colors" to="/injuries">Recovery Plan</Link>
             <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-            <span className="text-on-background font-medium">L. Ankle Sprain</span>
+            <span className="text-on-background font-medium capitalize">{selectedInjury.injuryType}</span>
           </div>
           <div className="flex items-center gap-3">
-            <h2 className="font-headline-lg text-headline-lg text-on-background">L. Ankle Sprain</h2>
-            <span className="px-3 py-1 bg-error-container text-on-error-container font-label-md text-label-md rounded border border-error/20">Grade II</span>
+            <h2 className="font-headline-lg text-headline-lg text-on-background capitalize">{selectedInjury.muscleGroup} {selectedInjury.injuryType}</h2>
+            <span className="px-3 py-1 bg-error-container text-on-error-container font-label-md text-label-md rounded border border-error/20 uppercase">{selectedInjury.severity}</span>
           </div>
         </div>
         <div className="flex space-x-3 w-full sm:w-auto">
-          <Link to="/injuries/1/edit" className="flex-1 sm:flex-none px-4 py-2 border border-outline-variant text-on-background font-label-md text-label-md rounded hover:border-outline transition-colors flex items-center justify-center gap-2">
+          <Link to={`/injuries/${id}/edit`} className="flex-1 sm:flex-none px-4 py-2 border border-outline-variant text-on-background font-label-md text-label-md rounded hover:border-outline transition-colors flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-[18px]">edit</span>
             Edit Details
           </Link>
@@ -38,30 +51,30 @@ export default function InjuryDetails() {
               <span className="material-symbols-outlined text-primary">clinical_notes</span>
               Clinical Summary
             </h3>
-            <span className="font-mono-data text-mono-data text-on-surface-variant">ID: INJ-8829-LA</span>
+            <span className="font-mono-data text-mono-data text-on-surface-variant">ID: {selectedInjury.id.substring(0,8)}</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
             <div>
               <p className="font-label-md text-label-md text-on-surface-variant mb-1">MUSCLE GROUP</p>
-              <p className="font-body-md text-body-md text-on-background font-medium">Lower Leg / Ankle</p>
+              <p className="font-body-md text-body-md text-on-background font-medium capitalize">{selectedInjury.muscleGroup}</p>
             </div>
             <div>
               <p className="font-label-md text-label-md text-on-surface-variant mb-1">INJURY TYPE</p>
-              <p className="font-body-md text-body-md text-on-background font-medium">Ligament Tear</p>
+              <p className="font-body-md text-body-md text-on-background font-medium capitalize">{selectedInjury.injuryType}</p>
             </div>
             <div>
               <p className="font-label-md text-label-md text-on-surface-variant mb-1">DATE OF INJURY</p>
-              <p className="font-body-md text-body-md text-on-background font-medium">Oct 12, 2023</p>
+              <p className="font-body-md text-body-md text-on-background font-medium">{new Date(selectedInjury.dateOccurred).toLocaleDateString()}</p>
             </div>
             <div>
-              <p className="font-label-md text-label-md text-on-surface-variant mb-1">MECHANISM</p>
-              <p className="font-body-md text-body-md text-on-background font-medium">Inversion during landing</p>
+              <p className="font-label-md text-label-md text-on-surface-variant mb-1">STATUS</p>
+              <p className="font-body-md text-body-md text-on-background font-medium capitalize">{selectedInjury.recoveryStatus}</p>
             </div>
           </div>
           <div>
             <p className="font-label-md text-label-md text-on-surface-variant mb-2">CLINICIAN NOTES</p>
             <p className="font-body-sm text-body-sm text-on-background leading-relaxed bg-surface-container-low p-4 rounded-lg border border-surface-container">
-              Patient presents with significant swelling and ecchymosis over the lateral malleolus. Positive anterior drawer test. Tenderness palpated over the Anterior Talo-Fibular Ligament (ATFL). No bony point tenderness. Gait is antalgic. Initial management: RICE protocol, immobilization in walking boot for 7-10 days, followed by early mobilization and proprioceptive training.
+              {selectedInjury.notes || 'No notes provided.'}
             </p>
           </div>
         </div>

@@ -50,7 +50,7 @@ export default function ChallengeGenerate() {
       setIsGenerating(true);
       setServerError('');
       await generateChallenge(data);
-      navigate('/challenges/1'); // Route to active challenge or ID
+      navigate('/challenges/active');
     } catch (err) {
       setServerError(err.response?.data?.message || 'Failed to generate challenge.');
       setIsGenerating(false);

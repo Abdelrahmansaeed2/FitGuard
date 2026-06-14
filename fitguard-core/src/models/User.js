@@ -35,6 +35,24 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  role: {
+    type: String,
+    enum: ['athlete', 'admin'],
+    default: 'athlete'
+  },
+  avatarUrl: {
+    type: String,
+    default: null
+  },
+  settings: {
+    alerts: { type: Boolean, default: true },
+    summary: { type: Boolean, default: true },
+    updates: { type: Boolean, default: false }
+  },
+  connectedDevices: [{
+    provider: { type: String, enum: ['whoop', 'garmin', 'apple_health'] },
+    connectedAt: { type: Date, default: Date.now }
+  }],
   refreshTokens: {
     type: [String],
     default: []

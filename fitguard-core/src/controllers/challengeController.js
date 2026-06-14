@@ -3,6 +3,7 @@ const InjuryLog = require('../models/InjuryLog');
 const Notification = require('../models/Notification');
 const aiService = require('../services/aiService');
 const { getInjuryAIContext } = require('../utils/injuryPatterns');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.generateChallenge = async (req, res, next) => {
   try {
@@ -65,11 +66,19 @@ exports.generateChallenge = async (req, res, next) => {
 
 exports.getChallenges = async (req, res, next) => {
   try {
-    const challenges = await Challenge.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    const features = new APIFeatures(Challenge.find({ userId: req.user._id }), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    const challenges = await features.query;
+    const total = await Challenge.countDocuments({ userId: req.user._id, ...features.query.getQuery() });
 
     res.status(200).json({
       success: true,
       data: challenges,
+      total,
       message: 'Challenges retrieved successfully'
     });
   } catch (err) {
@@ -92,6 +101,27 @@ exports.getActiveChallenge = async (req, res, next) => {
       success: true,
       data: challenge,
       message: 'Active challenge retrieved successfully'
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getChallengeById = async (req, res, next) => {
+  try {
+    const challenge = await Challenge.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!challenge) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: 'Challenge not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: challenge,
+      message: 'Challenge retrieved successfully'
     });
   } catch (err) {
     next(err);

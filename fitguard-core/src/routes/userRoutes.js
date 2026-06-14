@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const userController = require('../controllers/userController');
 const auth = require('../middleware/auth');
+const authorize = require('../middleware/authorize');
 const validate = require('../middleware/validate');
 
 const router = express.Router();
@@ -21,6 +22,24 @@ router.put(
   ],
   validate,
   userController.updateProfile
+);
+
+router.put(
+  '/settings',
+  [
+    body('settings').isObject().withMessage('Settings object is required')
+  ],
+  validate,
+  userController.updateSettings
+);
+
+router.put(
+  '/devices',
+  [
+    body('devices').isArray().withMessage('Devices array is required')
+  ],
+  validate,
+  userController.updateDevices
 );
 
 module.exports = router;

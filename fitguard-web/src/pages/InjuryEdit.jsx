@@ -42,25 +42,35 @@ export default function InjuryEdit() {
 
   useEffect(() => {
     if (selectedInjury) {
+      let severityNum = 4;
+      if (selectedInjury.severity === 'mild') severityNum = 2;
+      else if (selectedInjury.severity === 'severe') severityNum = 9;
+
       reset({
         muscleGroup: selectedInjury.muscleGroup || '',
         injuryType: selectedInjury.injuryType || '',
-        recoveryStatus: selectedInjury.recoveryStatus || 'recovering',
-        severity: selectedInjury.severity || 4,
-        dateOccurred: selectedInjury.dateOccurred || '2023-11-04',
+        recoveryStatus: selectedInjury.recoveryStatus || 'active',
+        severity: severityNum,
+        dateOccurred: selectedInjury.dateOccurred ? new Date(selectedInjury.dateOccurred).toISOString().split('T')[0] : '',
         notes: selectedInjury.notes || ''
       });
     }
   }, [selectedInjury, reset]);
 
+  /* eslint-disable-next-line react-hooks/incompatible-library */
   const severityValue = watch('severity');
 
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
       setServerError('');
-      await updateInjury(id, data);
-      navigate(`/injuries/${id || '1'}`);
+      const payload = { ...data };
+      if (payload.severity <= 3) payload.severity = 'mild';
+      else if (payload.severity <= 7) payload.severity = 'moderate';
+      else payload.severity = 'severe';
+
+      await updateInjury(id, payload);
+      navigate(`/injuries/${id}`);
     } catch (err) {
       setServerError(err.response?.data?.message || 'Failed to update injury.');
     } finally {
@@ -85,7 +95,7 @@ export default function InjuryEdit() {
             <p className="text-body-lg text-on-surface-variant mt-1">Update clinical status and recovery metrics.</p>
           </div>
           <div className="hidden sm:flex space-x-3">
-            <Link to={`/injuries/${id || '1'}`} className="px-4 py-2 border border-outline-variant rounded-lg text-body-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors">
+            <Link to={`/injuries/${id}`} className="px-4 py-2 border border-outline-variant rounded-lg text-body-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors">
               Cancel
             </Link>
             <button 
@@ -114,9 +124,9 @@ export default function InjuryEdit() {
           <div>
             <div className="flex items-center space-x-3 mb-1">
               <span className="material-symbols-outlined text-tertiary">sports_gymnastics</span>
-              <h3 className="text-headline-sm font-headline-sm text-on-surface">Grade 2 Hamstring Strain</h3>
+              <h3 className="text-headline-sm font-headline-sm text-on-surface capitalize">{selectedInjury?.injuryType || 'Injury'}</h3>
             </div>
-            <p className="text-body-sm text-on-surface-variant font-mono-data">Right Leg • Biceps Femoris • Logged: Oct 12, 2023</p>
+            <p className="text-body-sm text-on-surface-variant font-mono-data capitalize">{selectedInjury?.muscleGroup} • {selectedInjury?.injuryType} • Logged: {selectedInjury?.dateOccurred ? new Date(selectedInjury.dateOccurred).toLocaleDateString() : ''}</p>
           </div>
           <div className="flex items-center space-x-2 bg-white px-3 py-1.5 border border-outline-variant rounded-full">
             <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
@@ -137,9 +147,8 @@ export default function InjuryEdit() {
                   className={`w-full appearance-none clinical-input bg-white text-body-md text-on-surface rounded-lg py-3 pl-4 pr-10 ${errors.recoveryStatus ? 'border-error' : ''}`} 
                   id="recoveryStatus"
                 >
-                  <option value="recovering">Recovering</option>
+                  <option value="active">Active Monitoring</option>
                   <option value="recovered">Recovered</option>
-                  <option value="complications">Complications</option>
                 </select>
                 <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
               </div>
@@ -220,7 +229,7 @@ export default function InjuryEdit() {
         </form>
 
         <div className="sm:hidden bg-surface border-t border-outline-variant p-4 flex gap-3 sticky bottom-0">
-          <Link to={`/injuries/${id || '1'}`} className="flex-1 py-3 border border-outline-variant rounded-lg text-body-md font-medium text-on-surface hover:bg-surface-container-low transition-colors text-center">
+          <Link to={`/injuries/${id}`} className="flex-1 py-3 border border-outline-variant rounded-lg text-body-md font-medium text-on-surface hover:bg-surface-container-low transition-colors text-center">
             Cancel
           </Link>
           <button 

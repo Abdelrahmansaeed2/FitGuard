@@ -1,16 +1,22 @@
 import { useState } from 'react';
-import { useAthleteStore } from '../../store/useAthleteStore';
+import { useInjuryStore } from '../../store/injuryStore';
 import { PlusCircle } from 'lucide-react';
 
 export default function InjuryForm() {
-  const addInjury = useAthleteStore((state) => state.addInjury);
-  const [formData, setFormData] = useState({ muscle: '', severity: 'Low', status: 'Active' });
+  const createInjury = useInjuryStore((state) => state.createInjury);
+  const [formData, setFormData] = useState({ muscleGroup: '', severity: 'Low', injuryType: 'Muscle' });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.muscle) return;
-    addInjury({ ...formData, date: new Date().toISOString().split('T')[0] });
-    setFormData({ muscle: '', severity: 'Low', status: 'Active' });
+    if (!formData.muscleGroup) return;
+    await createInjury({ 
+      muscleGroup: formData.muscleGroup,
+      injuryType: formData.injuryType,
+      severity: formData.severity.toLowerCase() === 'low' ? 'mild' : formData.severity.toLowerCase() === 'medium' ? 'moderate' : 'severe',
+      dateOccurred: new Date().toISOString(),
+      recoveryStatus: 'active'
+    });
+    setFormData({ muscleGroup: '', severity: 'Low', injuryType: 'Muscle' });
   };
 
   return (
@@ -23,8 +29,8 @@ export default function InjuryForm() {
           type="text" 
           placeholder="Affected Muscle (e.g., Knee)" 
           className="border p-2 rounded-lg w-full focus:outline-none focus:border-primary"
-          value={formData.muscle}
-          onChange={(e) => setFormData({ ...formData, muscle: e.target.value })}
+          value={formData.muscleGroup}
+          onChange={(e) => setFormData({ ...formData, muscleGroup: e.target.value })}
         />
         <select 
           className="border p-2 rounded-lg w-full focus:outline-none focus:border-primary"

@@ -1,7 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRecoveryStore } from '../store/recoveryStore';
+import { Link } from 'react-router-dom';
 
 export default function ActiveRecovery() {
+  const { activeProtocol, fetchActiveProtocol, completePhase } = useRecoveryStore();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    fetchActiveProtocol();
+  }, [fetchActiveProtocol]);
+
+  if (!activeProtocol) {
+    return <div className="p-8 text-center">No active recovery protocol found. <Link to="/injuries" className="text-primary underline">View Injuries</Link></div>;
+  }
+
+  const handleCompletePhase = async () => {
+    await completePhase(activeProtocol.id, activeProtocol.currentPhase);
+    setShowSuccessModal(true);
+  };
+
+  const currentPhaseIndex = activeProtocol.phases.findIndex(p => p.phaseNumber === activeProtocol.currentPhase);
+  const currentPhaseData = activeProtocol.phases[currentPhaseIndex];
+  const injury = activeProtocol.injuryLogId;
 
   return (
     <div className="p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full relative">
@@ -10,13 +30,13 @@ export default function ActiveRecovery() {
         <div>
           <div className="flex items-center space-x-2 mb-2">
             <span className="px-2 py-1 rounded bg-error-container text-on-error-container font-label-md text-label-md">Active Protocol</span>
-            <span className="text-on-surface-variant font-mono-data text-mono-data">ID: RC-8834-A</span>
+            <span className="text-on-surface-variant font-mono-data text-mono-data">ID: {activeProtocol.id?.substring(0, 8)}</span>
           </div>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">Right Achilles Tendinopathy</h2>
-          <p className="font-body-lg text-body-lg text-on-surface-variant mt-1">Week 3 of 8 • Moderate Load Phase</p>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface">{injury?.muscleGroup} {injury?.injuryType}</h2>
+          <p className="font-body-lg text-body-lg text-on-surface-variant mt-1">{currentPhaseData?.name} • Moderate Load Phase</p>
         </div>
         <button 
-          onClick={() => setShowSuccessModal(true)}
+          onClick={handleCompletePhase}
           className="bg-primary hover:bg-on-primary-container text-on-primary font-label-md text-label-md py-3 px-6 rounded-lg shadow-sm transition-colors flex items-center space-x-2"
         >
           <span className="material-symbols-outlined">check_circle</span>
@@ -38,46 +58,50 @@ export default function ActiveRecovery() {
               {/* Connecting Line */}
               <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-surface-variant ml-[-1px]"></div>
               <div className="space-y-6">
-                {/* Phase 1: Complete */}
-                <div className="relative flex items-start pl-10 opacity-60">
-                  <div className="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-outline-variant outline outline-4 outline-surface-container-lowest"></div>
-                  <div>
-                    <h4 className="font-label-md text-label-md text-outline">Phase 1: Acute Management</h4>
-                    <p className="font-body-sm text-body-sm text-outline-variant mt-1">Inflammation control and tissue protection. (Weeks 1-2)</p>
-                  </div>
-                </div>
-                {/* Phase 2: Active */}
-                <div className="relative flex items-start pl-10">
-                  <div className="absolute left-2 top-1 w-4 h-4 rounded-full bg-primary outline outline-4 outline-primary-container animate-pulse"></div>
-                  <div className="bg-surface-container p-4 rounded-lg border border-outline-variant w-full">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="font-label-md text-label-md text-primary">Phase 2: Proliferation (Current)</h4>
-                      <span className="px-2 py-0.5 rounded text-xs font-mono-data bg-surface-lowest text-on-surface-variant border border-outline-variant">Days 15-30</span>
-                    </div>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">Gradual reintroduction of load. Focus on isometric holds and controlled eccentrics to stimulate collagen alignment.</p>
-                    {/* Progress Bar */}
-                    <div className="w-full bg-surface-variant rounded-full h-2.5 mb-1">
-                      <div className="bg-primary h-2.5 rounded-full" style={{ width: '45%' }}></div>
-                    </div>
-                    <p className="text-right text-xs font-mono-data text-on-surface-variant">45% Complete</p>
-                  </div>
-                </div>
-                {/* Phase 3: Upcoming */}
-                <div className="relative flex items-start pl-10">
-                  <div className="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-surface-variant outline outline-4 outline-surface-container-lowest"></div>
-                  <div>
-                    <h4 className="font-label-md text-label-md text-on-surface-variant">Phase 3: Remodeling</h4>
-                    <p className="font-body-sm text-body-sm text-outline mt-1">Heavy slow resistance training and dynamic loading.</p>
-                  </div>
-                </div>
-                {/* Phase 4: Upcoming */}
-                <div className="relative flex items-start pl-10">
-                  <div className="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-surface-variant outline outline-4 outline-surface-container-lowest"></div>
-                  <div>
-                    <h4 className="font-label-md text-label-md text-on-surface-variant">Phase 4: Return to Play</h4>
-                    <p className="font-body-sm text-body-sm text-outline mt-1">Sport-specific drills and explosive movements.</p>
-                  </div>
-                </div>
+                {activeProtocol.phases.map((phase) => {
+                  const isCompleted = phase.completed;
+                  const isCurrent = phase.phaseNumber === activeProtocol.currentPhase;
+                  
+                  if (isCompleted) {
+                    return (
+                      <div key={phase.phaseNumber} className="relative flex items-start pl-10 opacity-60">
+                        <div className="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-outline-variant outline outline-4 outline-surface-container-lowest"></div>
+                        <div>
+                          <h4 className="font-label-md text-label-md text-outline">Phase {phase.phaseNumber}: {phase.name}</h4>
+                          <p className="font-body-sm text-body-sm text-outline-variant mt-1">{phase.durationDays} Days</p>
+                        </div>
+                      </div>
+                    );
+                  } else if (isCurrent) {
+                    return (
+                      <div key={phase.phaseNumber} className="relative flex items-start pl-10">
+                        <div className="absolute left-2 top-1 w-4 h-4 rounded-full bg-primary outline outline-4 outline-primary-container animate-pulse"></div>
+                        <div className="bg-surface-container p-4 rounded-lg border border-outline-variant w-full">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-label-md text-label-md text-primary">Phase {phase.phaseNumber}: {phase.name} (Current)</h4>
+                            <span className="px-2 py-0.5 rounded text-xs font-mono-data bg-surface-lowest text-on-surface-variant border border-outline-variant">{phase.durationDays} Days</span>
+                          </div>
+                          <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">{phase.exercises.map(e => e.name || e).join(', ')}</p>
+                          {/* Progress Bar */}
+                          <div className="w-full bg-surface-variant rounded-full h-2.5 mb-1">
+                            <div className="bg-primary h-2.5 rounded-full" style={{ width: '45%' }}></div>
+                          </div>
+                          <p className="text-right text-xs font-mono-data text-on-surface-variant">Active</p>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={phase.phaseNumber} className="relative flex items-start pl-10">
+                        <div className="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-surface-variant outline outline-4 outline-surface-container-lowest"></div>
+                        <div>
+                          <h4 className="font-label-md text-label-md text-on-surface-variant">Phase {phase.phaseNumber}: {phase.name}</h4>
+                          <p className="font-body-sm text-body-sm text-outline mt-1">{phase.durationDays} Days</p>
+                        </div>
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
           </div>
@@ -92,41 +116,16 @@ export default function ActiveRecovery() {
               <span className="font-mono-data text-mono-data text-on-surface-variant">Oct 24, 2024</span>
             </div>
             <div className="space-y-3">
-              {/* Task 1 */}
-              <label className="flex items-center p-4 rounded-lg border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors">
-                <input type="checkbox" defaultChecked className="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface mr-4" />
-                <div className="flex-grow">
-                  <span className="font-body-md text-body-md text-on-surface line-through opacity-70">Morning Assessment Readiness</span>
-                </div>
-                <span className="font-label-md text-label-md text-on-surface-variant">Completed 08:00</span>
-              </label>
-              {/* Task 2 */}
-              <label className="flex items-center p-4 rounded-lg border border-primary bg-primary-container bg-opacity-10 cursor-pointer transition-colors group">
-                <input type="checkbox" className="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface mr-4" />
-                <div className="flex-grow">
-                  <span className="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">15min Contrast Bath Therapy</span>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">3 min hot / 1 min cold. Repeat 3x. End on cold.</p>
-                </div>
-                <span className="material-symbols-outlined text-outline-variant group-hover:text-primary">info</span>
-              </label>
-              {/* Task 3 */}
-              <label className="flex items-center p-4 rounded-lg border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors group">
-                <input type="checkbox" className="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface mr-4" />
-                <div className="flex-grow">
-                  <span className="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Ankle ISO Holds (Seated)</span>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">4 sets x 45 seconds. 2 min rest between sets.</p>
-                </div>
-                <span className="material-symbols-outlined text-outline-variant group-hover:text-primary">fitness_center</span>
-              </label>
-              {/* Task 4 */}
-              <label className="flex items-center p-4 rounded-lg border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors group">
-                <input type="checkbox" className="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface mr-4" />
-                <div className="flex-grow">
-                  <span className="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Biometric Data Sync</span>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Upload HRV and Sleep data from wearable.</p>
-                </div>
-                <span className="material-symbols-outlined text-outline-variant group-hover:text-primary">sync</span>
-              </label>
+              {currentPhaseData?.exercises.map((exercise, idx) => (
+                <label key={idx} className="flex items-center p-4 rounded-lg border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors group">
+                  <input type="checkbox" className="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface mr-4" />
+                  <div className="flex-grow">
+                    <span className="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">{exercise.name || exercise}</span>
+                    {exercise.sets && <span className="block font-body-sm text-body-sm text-on-surface-variant">{exercise.sets} sets x {exercise.reps}</span>}
+                  </div>
+                  <span className="material-symbols-outlined text-outline-variant group-hover:text-primary">fitness_center</span>
+                </label>
+              ))}
             </div>
           </div>
         </div>
@@ -212,7 +211,10 @@ export default function ActiveRecovery() {
                 View Next Phase
               </button>
               <button 
-                onClick={() => setShowSuccessModal(false)}
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  fetchActiveProtocol();
+                }}
                 className="w-full bg-transparent border border-outline-variant text-on-surface font-label-md text-label-md py-3 rounded-lg hover:bg-surface-container-low transition-colors"
               >
                 Dismiss

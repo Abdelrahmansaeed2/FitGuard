@@ -48,4 +48,15 @@ router.post(
   authController.refreshToken
 );
 
+router.put(
+  '/password',
+  require('../middleware/auth'),
+  [
+    body('currentPassword').notEmpty().withMessage('Current password is required'),
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters long')
+  ],
+  validate,
+  authController.updatePassword
+);
+
 module.exports = router;

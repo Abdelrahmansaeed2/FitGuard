@@ -23,6 +23,15 @@ router.get('/', challengeController.getChallenges);
 
 router.get('/active', challengeController.getActiveChallenge);
 
+router.get(
+  '/:id',
+  [
+    param('id').isMongoId().withMessage('Invalid challenge ID')
+  ],
+  validate,
+  challengeController.getChallengeById
+);
+
 router.put(
   '/:id/day/:dayNumber/complete',
   [

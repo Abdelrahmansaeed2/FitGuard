@@ -1,18 +1,12 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAthleteStore } from '../store/useAthleteStore';
+
+import { Link } from 'react-router-dom';
 import { useNotificationStore } from '../store/notificationStore';
-import { useAuthStore } from '../store/authStore';
+import { useProfileStore } from '../store/profileStore';
 import Sidebar from './Sidebar';
+
 export default function AppLayout({ children }) {
-  const { profile } = useAthleteStore();
   const { unreadCount } = useNotificationStore();
-  const location = useLocation();
-  const logout = useAuthStore((state) => state.logout);
-
-  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
-
-  return (
+  const { profile } = useProfileStore();  return (
     <div className="flex bg-surface min-h-screen font-body-md text-body-md text-on-surface">
       {/* SideNavBar */}
       <Sidebar />
@@ -33,7 +27,7 @@ export default function AppLayout({ children }) {
               )}
             </Link>
             <Link to="/profile" className="text-on-surface-variant hover:bg-surface-container-high rounded-full p-2 transition-transform duration-200 hover:scale-105 active:scale-95 flex items-center justify-center overflow-hidden">
-              <img alt="Athlete Profile Image" className="w-8 h-8 rounded-full object-cover" data-alt="A close-up profile portrait of a focused, athletic man with short dark hair in a modern, brightly lit gymnasium setting. He is wearing high-performance athletic gear. The lighting is crisp and cool, highlighting the texture of the fabric and a light sheen of sweat, conveying intense physical effort and peak performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF0Uu2YajOO33g6fjIKQjK8obJDier1d243ay8PfxRzQVXjlVXPXKKID7AGPKxSDLCLTrOu9e17Bg1RQtuu4dzvkHjG0St2Pm-MOakCHKpfEXoxatwOcGOt7q3Lt6gqsxC9jV6Vuc9FaYPtJWs4n4E9VVXBL8UFYDm2W29-iSWDqXQUbVArOf1FMvffryFX4CQdktkzZRo6G3fBNO0-kokClbN7mTyCUT2Qdsipyg6ezC18zAiIBxvCOieTNQhIrMLLfvUC-3duJs" />
+              <img alt="Athlete Profile Image" className="w-8 h-8 rounded-full object-cover" src={profile?.avatarUrl || "https://ui-avatars.com/api/?name=" + (profile?.name || "Athlete") + "&background=random"} />
             </Link>
           </div>
         </header>

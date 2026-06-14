@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useAuthStore } from '../store/authStore';
+import { useProfileStore } from '../store/profileStore';
 
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
@@ -13,25 +15,84 @@ const passwordSchema = z.object({
 });
 
 export default function Settings() {
+  const { user, updatePassword } = useAuthStore();
+  const { profile, fetchProfile, updateSettings, updateDevices } = useProfileStore();
+  
   const [toggles, setToggles] = useState({
     alerts: true,
     summary: true,
     updates: false
   });
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
+
+  useEffect(() => {
+    if (profile?.settings) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setToggles({
+        alerts: profile.settings.alerts ?? true,
+        summary: profile.settings.summary ?? true,
+        updates: profile.settings.updates ?? false
+      });
+    }
+  }, [profile?.settings]);
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(passwordSchema)
   });
 
   const onSubmitPassword = async (data) => {
-    // Simulate API Call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    alert('Password updated successfully');
+    try {
+      await updatePassword({ currentPassword: data.currentPassword, newPassword: data.newPassword });
+      alert('Password updated successfully');
+      reset();
+    } catch (error) {
+      alert(error.message || 'Failed to update password');
+    }
   };
 
-  const handleToggle = (key) => {
-    setToggles(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleToggle = async (key) => {
+    const newToggles = { ...toggles, [key]: !toggles[key] };
+    setToggles(newToggles);
+    try {
+      await updateSettings(newToggles);
+    } catch (err) { // eslint-disable-line no-unused-vars
+      // Revert if error
+      setToggles(toggles);
+    }
   };
+
+  const [saving, setSaving] = useState(false);
+
+  const handleSaveConfig = async () => {
+    setSaving(true);
+    try {
+      await updateSettings(toggles);
+      alert('Configuration saved successfully');
+    } catch (err) { // eslint-disable-line no-unused-vars
+      alert('Failed to save configuration');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDisconnectDevice = async (deviceName) => {
+    if (profile?.connectedDevices) {
+      const newDevices = profile.connectedDevices.filter(d => d.name !== deviceName);
+      await updateDevices(newDevices);
+    }
+  };
+
+  const handleConnectDevice = async (deviceName) => {
+    const newDevices = [...(profile?.connectedDevices || []), { name: deviceName, lastSync: new Date().toISOString() }];
+    await updateDevices(newDevices);
+  };
+
+  if (!profile || !user) {
+    return <div className="p-8 text-center">Loading settings...</div>;
+  }
 
   return (
     <div className="flex-1 p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
@@ -62,16 +123,16 @@ export default function Settings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-label-md text-label-md text-on-surface-variant mb-1">First Name</label>
-                    <input className="w-full px-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md text-body-md text-on-surface opacity-70" disabled type="text" value="Alexander" />
+                    <input className="w-full px-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md text-body-md text-on-surface opacity-70" disabled type="text" value={profile.name.split(' ')[0] || ''} />
                   </div>
                   <div>
                     <label className="block font-label-md text-label-md text-on-surface-variant mb-1">Last Name</label>
-                    <input className="w-full px-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md text-body-md text-on-surface opacity-70" disabled type="text" value="Sterling" />
+                    <input className="w-full px-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md text-body-md text-on-surface opacity-70" disabled type="text" value={profile.name.split(' ').slice(1).join(' ') || ''} />
                   </div>
                 </div>
                 <div>
                   <label className="block font-label-md text-label-md text-on-surface-variant mb-1">Email Address</label>
-                  <input className="w-full px-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md text-body-md text-on-surface opacity-70" disabled type="email" value="alexander.s@eliteathletics.com" />
+                  <input className="w-full px-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md text-body-md text-on-surface opacity-70" disabled type="email" value={profile.email} />
                 </div>
                 <div className="pt-4 border-t border-surface-variant flex justify-between items-center">
                   <div>
@@ -145,32 +206,62 @@ export default function Settings() {
               
               <div className="space-y-4">
                 {/* WHOOP Integration (Active) */}
-                <div className="flex items-center justify-between p-4 bg-surface-container border border-outline-variant rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-on-surface rounded-md flex items-center justify-center text-surface-container-lowest font-headline-sm font-bold">W</div>
-                    <div>
-                      <p className="font-headline-sm text-headline-sm text-on-surface text-base">WHOOP</p>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant text-xs flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-primary-container inline-block"></span> Syncing Active
-                      </p>
+                {profile.connectedDevices?.find(d => d.name === 'WHOOP') ? (
+                  <div className="flex items-center justify-between p-4 bg-surface-container border border-outline-variant rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-on-surface rounded-md flex items-center justify-center text-surface-container-lowest font-headline-sm font-bold">W</div>
+                      <div>
+                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">WHOOP</p>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-primary-container inline-block"></span> Syncing Active
+                        </p>
+                      </div>
                     </div>
+                    <button onClick={() => handleDisconnectDevice('WHOOP')} className="font-label-md text-label-md px-3 py-1 border border-outline-variant text-on-surface rounded hover:bg-surface-container-high transition-colors">Disconnect</button>
                   </div>
-                  <button className="font-label-md text-label-md px-3 py-1 border border-outline-variant text-on-surface rounded hover:bg-surface-container-high transition-colors">Disconnect</button>
-                </div>
+                ) : (
+                  <div className="flex items-center justify-between p-4 bg-surface border border-outline-variant rounded-lg opacity-80">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-on-surface rounded-md flex items-center justify-center text-surface-container-lowest font-headline-sm font-bold">W</div>
+                      <div>
+                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">WHOOP</p>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">Not connected</p>
+                      </div>
+                    </div>
+                    <button onClick={() => handleConnectDevice('WHOOP')} className="font-label-md text-label-md px-3 py-1 bg-surface-container text-on-surface rounded hover:bg-surface-container-high transition-colors">Connect</button>
+                  </div>
+                )}
 
                 {/* Garmin Integration (Inactive) */}
-                <div className="flex items-center justify-between p-4 bg-surface border border-outline-variant rounded-lg opacity-80">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-[#000] rounded-md flex items-center justify-center">
-                      <span className="material-symbols-outlined text-white">sports_score</span>
+                {profile.connectedDevices?.find(d => d.name === 'Garmin Connect') ? (
+                  <div className="flex items-center justify-between p-4 bg-surface-container border border-outline-variant rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-[#000] rounded-md flex items-center justify-center">
+                        <span className="material-symbols-outlined text-white">sports_score</span>
+                      </div>
+                      <div>
+                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">Garmin Connect</p>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-primary-container inline-block"></span> Syncing Active
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-headline-sm text-headline-sm text-on-surface text-base">Garmin Connect</p>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">Not connected</p>
-                    </div>
+                    <button onClick={() => handleDisconnectDevice('Garmin Connect')} className="font-label-md text-label-md px-3 py-1 border border-outline-variant text-on-surface rounded hover:bg-surface-container-high transition-colors">Disconnect</button>
                   </div>
-                  <button className="font-label-md text-label-md px-3 py-1 bg-surface-container text-on-surface rounded hover:bg-surface-container-high transition-colors">Connect</button>
-                </div>
+                ) : (
+                  <div className="flex items-center justify-between p-4 bg-surface border border-outline-variant rounded-lg opacity-80">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-[#000] rounded-md flex items-center justify-center">
+                        <span className="material-symbols-outlined text-white">sports_score</span>
+                      </div>
+                      <div>
+                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">Garmin Connect</p>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">Not connected</p>
+                      </div>
+                    </div>
+                    <button onClick={() => handleConnectDevice('Garmin Connect')} className="font-label-md text-label-md px-3 py-1 bg-surface-container text-on-surface rounded hover:bg-surface-container-high transition-colors">Connect</button>
+                  </div>
+                )}
 
                 <div className="pt-4 flex justify-center">
                   <button className="font-label-md text-label-md text-primary hover:underline flex items-center gap-1">
@@ -253,7 +344,9 @@ export default function Settings() {
         {/* Action Buttons Bottom */}
         <div className="flex justify-end gap-4 pt-6 border-t border-outline-variant pb-12">
           <button className="px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-high transition-colors">Discard Changes</button>
-          <button className="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm">Save Configuration</button>
+          <button onClick={handleSaveConfig} disabled={saving} className="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm disabled:opacity-50">
+            {saving ? 'Saving...' : 'Save Configuration'}
+          </button>
         </div>
 
       </div>

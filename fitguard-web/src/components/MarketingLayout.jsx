@@ -1,7 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+
+import { Link, NavLink } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 export default function MarketingLayout({ children }) {
+  const { isAuthenticated } = useAuthStore();
   return (
     <div className="min-h-screen flex flex-col font-body-md bg-background text-on-background antialiased relative">
       {/* Background Pattern */}
@@ -19,14 +21,20 @@ export default function MarketingLayout({ children }) {
             FitGuard
           </div>
           <div className="hidden md:flex space-x-8">
-            <Link to="/" className="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 opacity-80">Home</Link>
-            <Link to="/about" className="text-on-surface-variant dark:text-surface-variant font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200">About</Link>
-            <Link to="/faq" className="text-on-surface-variant dark:text-surface-variant font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200">FAQ</Link>
-            <Link to="/contact" className="text-on-surface-variant dark:text-surface-variant font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200">Contact</Link>
+            <NavLink to="/" className={({isActive}) => isActive ? "text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 opacity-80" : "text-on-surface-variant dark:text-surface-variant font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200"}>Home</NavLink>
+            <NavLink to="/about" className={({isActive}) => isActive ? "text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 opacity-80" : "text-on-surface-variant dark:text-surface-variant font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200"}>About</NavLink>
+            <NavLink to="/faq" className={({isActive}) => isActive ? "text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 opacity-80" : "text-on-surface-variant dark:text-surface-variant font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200"}>FAQ</NavLink>
+            <NavLink to="/contact" className={({isActive}) => isActive ? "text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 opacity-80" : "text-on-surface-variant dark:text-surface-variant font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200"}>Contact</NavLink>
           </div>
           <div className="flex items-center space-x-4">
-            <Link to="/login" className="text-on-surface font-label-md text-label-md hover:text-primary transition-colors">Login</Link>
-            <Link to="/register" className="bg-primary-container text-on-primary-container px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">Sign Up</Link>
+            {isAuthenticated ? (
+              <Link to="/dashboard" className="bg-primary-container text-on-primary-container px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">Dashboard</Link>
+            ) : (
+              <>
+                <Link to="/login" className="text-on-surface font-label-md text-label-md hover:text-primary transition-colors">Login</Link>
+                <Link to="/register" className="bg-primary-container text-on-primary-container px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">Sign Up</Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

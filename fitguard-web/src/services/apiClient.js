@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -42,6 +42,31 @@ apiClient.interceptors.request.use(
 // Response Interceptor: Handle Global Errors & Token Refresh
 apiClient.interceptors.response.use(
   (response) => {
+    if (response.data && response.data.success !== undefined && response.data.data !== undefined) {
+      const transformIds = (obj) => {
+        if (Array.isArray(obj)) {
+          return obj.map(transformIds);
+        } else if (obj !== null && typeof obj === 'object') {
+          const newObj = { ...obj };
+          if (newObj._id) {
+            newObj.id = newObj._id.toString();
+          }
+          for (const key in newObj) {
+            if (key !== '_id' && key !== 'id') {
+              newObj[key] = transformIds(newObj[key]);
+            }
+          }
+          return newObj;
+        }
+        return obj;
+      };
+      
+      const transformedData = transformIds(response.data.data);
+      if (response.data.data.accessToken) {
+        transformedData.access_token = response.data.data.accessToken;
+      }
+      response.data = transformedData;
+    }
     return response;
   },
   async (error) => {

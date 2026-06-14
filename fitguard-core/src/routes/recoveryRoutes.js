@@ -21,6 +21,15 @@ router.get('/', recoveryController.getProtocols);
 
 router.get('/active', recoveryController.getActiveProtocols);
 
+router.get(
+  '/:id',
+  [
+    param('id').isMongoId().withMessage('Invalid protocol ID')
+  ],
+  validate,
+  recoveryController.getProtocolById
+);
+
 router.put(
   '/:id/phase/:phaseNumber/complete',
   [

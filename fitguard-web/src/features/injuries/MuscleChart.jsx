@@ -1,13 +1,13 @@
-import { useAthleteStore } from '../../store/useAthleteStore';
+import { useInjuryStore } from '../../store/injuryStore';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity } from 'lucide-react';
 
 export default function MuscleChart() {
-  const injuries = useAthleteStore((state) => state.injuries);
+  const injuries = useInjuryStore((state) => state.injuries);
   
   // تجميع الداتا عشان الرسم البياني
   const dataMap = injuries.reduce((acc, curr) => {
-    acc[curr.muscle] = (acc[curr.muscle] || 0) + 1;
+    acc[curr.muscleGroup] = (acc[curr.muscleGroup] || 0) + 1;
     return acc;
   }, {});
   

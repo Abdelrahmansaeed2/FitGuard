@@ -24,5 +24,10 @@ export const challengeService = {
   abandonChallenge: async (id) => {
     const response = await apiClient.put(`/challenges/${id}/abandon`);
     return response.data;
+  },
+
+  getChallengeById: async (id) => {
+    const response = await apiClient.get(`/challenges/${id}`);
+    return response.data;
   }
 };

@@ -79,3 +79,8 @@ out/
 .cache/
 .next/
 .nuxt/
+
+# User Uploads
+uploads/
+fitguard-core/uploads/
+audit_results.json

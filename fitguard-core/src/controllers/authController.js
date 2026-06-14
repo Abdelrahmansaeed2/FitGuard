@@ -4,12 +4,12 @@ const jwt = require('jsonwebtoken');
 
 function generateTokens(user) {
   const accessToken = jwt.sign(
-    { userId: user._id },
+    { userId: user._id, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: '15m' }
   );
   const refreshToken = jwt.sign(
-    { userId: user._id },
+    { userId: user._id, role: user.role },
     process.env.JWT_REFRESH_SECRET,
     { expiresIn: '7d' }
   );
@@ -52,6 +52,7 @@ exports.register = async (req, res, next) => {
           id: user._id,
           name: user.name,
           email: user.email,
+          role: user.role,
           sport: user.sport,
           age: user.age,
           weight: user.weight,
@@ -100,6 +101,7 @@ exports.login = async (req, res, next) => {
           id: user._id,
           name: user.name,
           email: user.email,
+          role: user.role,
           sport: user.sport,
           age: user.age,
           weight: user.weight,
@@ -170,6 +172,32 @@ exports.refreshToken = async (req, res, next) => {
         refreshToken: newTokens.refreshToken
       },
       message: 'Token refreshed successfully'
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Incorrect current password' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully'
     });
   } catch (err) {
     next(err);

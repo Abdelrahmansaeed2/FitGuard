@@ -7,7 +7,8 @@ export default function ChallengeHistory() {
 
   useEffect(() => {
     fetchChallenges();
-  }, []);
+  } // eslint-disable-next-line react-hooks/exhaustive-deps
+  , []);
 
   const completed = challenges.filter(c => c.status === 'completed').length;
   const inProgress = challenges.filter(c => c.status === 'active').length;

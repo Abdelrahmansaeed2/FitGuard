@@ -27,6 +27,11 @@ export const authService = {
     }
   },
 
+  updatePassword: async (passwords) => {
+    const response = await apiClient.put('/auth/password', passwords);
+    return response.data;
+  },
+
   refreshToken: async () => {
     const response = await apiClient.post('/auth/refresh-token');
     if (response.data.access_token) {

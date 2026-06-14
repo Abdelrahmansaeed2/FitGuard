@@ -1,5 +1,6 @@
 const InjuryLog = require('../models/InjuryLog');
 const Notification = require('../models/Notification');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.createInjury = async (req, res, next) => {
   try {
@@ -36,11 +37,19 @@ exports.createInjury = async (req, res, next) => {
 
 exports.getInjuries = async (req, res, next) => {
   try {
-    const injuries = await InjuryLog.find({ userId: req.user._id }).sort({ dateOccurred: -1 });
+    const features = new APIFeatures(InjuryLog.find({ userId: req.user._id }), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    
+    const injuries = await features.query;
+    const total = await InjuryLog.countDocuments({ userId: req.user._id, ...features.query.getQuery() });
 
     res.status(200).json({
       success: true,
       data: injuries,
+      total,
       message: 'Injury logs retrieved successfully'
     });
   } catch (err) {

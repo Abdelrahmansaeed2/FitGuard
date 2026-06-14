@@ -1,6 +1,24 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useRecoveryStore } from '../store/recoveryStore';
 
 export default function RecoveryDetails() {
+  const { id } = useParams();
+  const { fetchProtocolById } = useRecoveryStore();
+  const [protocol, setProtocol] = useState(null);
+
+  useEffect(() => {
+    fetchProtocolById(id).then(setProtocol);
+  }, [id, fetchProtocolById]);
+
+  if (!protocol) {
+    return <div className="p-8 text-center text-on-surface-variant">Loading recovery protocol...</div>;
+  }
+
+  const currentPhaseIndex = protocol.phases.findIndex(p => !p.completed);
+  const displayPhase = currentPhaseIndex === -1 ? protocol.phases.length : currentPhaseIndex + 1;
+  const currentPhaseData = protocol.phases[displayPhase - 1];
+  
   return (
     <div className="p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full pb-24">
       {/* Header Section */}
@@ -10,19 +28,21 @@ export default function RecoveryDetails() {
             <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
             <span>AI-Generated Protocol</span>
           </div>
-          <h2 className="font-display-md text-display-md text-on-surface mb-2">ACL Reconstruction Phase 1</h2>
+          <h2 className="font-display-md text-display-md text-on-surface mb-2 capitalize">{protocol.injuryLogId?.muscleGroup} {protocol.injuryLogId?.injuryType} Recovery</h2>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-            A clinical, data-driven 12-week recovery timeline optimized based on your recent biomechanical stress test and historical injury data.
+            A clinical, data-driven recovery timeline optimized based on your recent biomechanical stress test and historical injury data.
           </p>
         </div>
         <div className="flex space-x-4">
           <button className="px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors">
             Edit Parameters
           </button>
-          <Link to="/recovery/active" className="px-6 py-2 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg hover:opacity-90 transition-opacity flex items-center shadow-sm">
-            Accept Protocol
-            <span className="material-symbols-outlined ml-2 text-[18px]">check_circle</span>
-          </Link>
+          {protocol.status === 'active' && (
+            <Link to="/recovery/active" className="px-6 py-2 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg hover:opacity-90 transition-opacity flex items-center shadow-sm">
+              Continue Protocol
+              <span className="material-symbols-outlined ml-2 text-[18px]">check_circle</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -45,52 +65,25 @@ export default function RecoveryDetails() {
             
             {/* Phase Nodes */}
             <div className="flex w-[600px] md:w-full justify-between items-center px-4">
-              {/* Node 1: Active */}
-              <div className="flex flex-col items-center group cursor-pointer shrink-0 w-24">
-                <div className="w-12 h-12 bg-surface-container-lowest border-2 border-primary rounded-full flex items-center justify-center shadow-sm relative z-10">
-                  <div className="w-8 h-8 bg-primary-container rounded-full flex items-center justify-center text-on-primary">
-                    <span className="material-symbols-outlined text-[16px]">hotel</span>
+              {protocol.phases.map(phase => {
+                const isActive = phase.phaseNumber === displayPhase;
+                const isCompleted = phase.completed;
+                
+                return (
+                  <div key={phase.phaseNumber} className={`flex flex-col items-center group cursor-pointer shrink-0 w-24 ${!isActive && !isCompleted ? 'opacity-70' : ''}`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center relative z-10 ${isActive ? 'bg-surface-container-lowest border-2 border-primary shadow-sm' : 'bg-surface-container border border-outline-variant'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isActive ? 'bg-primary-container text-on-primary' : isCompleted ? 'bg-secondary text-white' : 'text-outline'}`}>
+                        {isCompleted ? <span className="material-symbols-outlined text-[16px]">check</span> : <span className="font-mono-data text-mono-data">{phase.phaseNumber}</span>}
+                      </div>
+                    </div>
+                    <div className="mt-3 text-center">
+                      <p className={`font-label-md text-label-md ${isActive || isCompleted ? 'text-primary' : 'text-on-surface'}`}>Phase {phase.phaseNumber}</p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant truncate w-24" title={phase.name}>{phase.name}</p>
+                      {isActive && <p className="font-mono-data text-[10px] text-primary mt-1 opacity-100">ACTIVE</p>}
+                    </div>
                   </div>
-                </div>
-                <div className="mt-3 text-center">
-                  <p className="font-label-md text-label-md text-primary">Phase 1</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Weeks 1-3</p>
-                  <p className="font-mono-data text-[10px] text-primary mt-1 opacity-100">ACTIVE</p>
-                </div>
-              </div>
-              
-              {/* Node 2: Pending */}
-              <div className="flex flex-col items-center group cursor-pointer opacity-70 hover:opacity-100 transition-opacity shrink-0 w-24">
-                <div className="w-10 h-10 bg-surface-container border border-outline-variant rounded-full flex items-center justify-center relative z-10 bg-surface-container-lowest">
-                  <span className="material-symbols-outlined text-outline text-[18px]">directions_walk</span>
-                </div>
-                <div className="mt-3 text-center">
-                  <p className="font-label-md text-label-md text-on-surface">Phase 2</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Weeks 4-6</p>
-                </div>
-              </div>
-              
-              {/* Node 3: Pending */}
-              <div className="flex flex-col items-center group cursor-pointer opacity-70 hover:opacity-100 transition-opacity shrink-0 w-24">
-                <div className="w-10 h-10 bg-surface-container border border-outline-variant rounded-full flex items-center justify-center relative z-10 bg-surface-container-lowest">
-                  <span className="material-symbols-outlined text-outline text-[18px]">fitness_center</span>
-                </div>
-                <div className="mt-3 text-center">
-                  <p className="font-label-md text-label-md text-on-surface">Phase 3</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Weeks 7-9</p>
-                </div>
-              </div>
-              
-              {/* Node 4: Pending */}
-              <div className="flex flex-col items-center group cursor-pointer opacity-70 hover:opacity-100 transition-opacity shrink-0 w-24">
-                <div className="w-10 h-10 bg-surface-container border border-outline-variant rounded-full flex items-center justify-center relative z-10 bg-surface-container-lowest">
-                  <span className="material-symbols-outlined text-outline text-[18px]">sports_martial_arts</span>
-                </div>
-                <div className="mt-3 text-center">
-                  <p className="font-label-md text-label-md text-on-surface">Phase 4</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Weeks 10-12</p>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -99,52 +92,36 @@ export default function RecoveryDetails() {
         <div className="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-surface-container-high">
             <div>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface">Phase 1: Protection & ROM</h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">Primary Goal: Reduce inflammation, achieve 90° flexion.</p>
+              <h3 className="font-headline-sm text-headline-sm text-on-surface">Phase {currentPhaseData.phaseNumber}: {currentPhaseData.name}</h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">Duration: {currentPhaseData.durationDays} Days</p>
             </div>
-            <div className="bg-error-container text-on-error-container px-3 py-1 rounded font-mono-data text-mono-data flex items-center">
-              <span className="material-symbols-outlined text-[14px] mr-1">warning</span>
-              High Risk Period
-            </div>
+            {protocol.status === 'active' && (
+              <div className="bg-primary-container text-on-primary-container px-3 py-1 rounded font-mono-data text-mono-data flex items-center">
+                <span className="material-symbols-outlined text-[14px] mr-1">timelapse</span>
+                In Progress
+              </div>
+            )}
           </div>
           
           <div className="space-y-6 flex-1">
-            {/* Instruction Group 1 */}
-            <div className="flex items-start space-x-4">
-              <div className="w-8 h-8 rounded bg-surface-container-low border border-outline-variant flex items-center justify-center shrink-0 mt-1">
-                <span className="font-mono-data text-mono-data text-on-surface">01</span>
-              </div>
-              <div>
-                <h4 className="font-label-md text-label-md text-on-surface mb-1">Brace Management</h4>
-                <p className="font-body-md text-body-md text-on-surface-variant">Keep brace locked in full extension during ambulation and sleep. Only unlock during approved ROM exercises.</p>
-              </div>
-            </div>
-            
-            {/* Instruction Group 2 */}
-            <div className="flex items-start space-x-4">
-              <div className="w-8 h-8 rounded bg-surface-container-low border border-outline-variant flex items-center justify-center shrink-0 mt-1">
-                <span className="font-mono-data text-mono-data text-on-surface">02</span>
-              </div>
-              <div>
-                <h4 className="font-label-md text-label-md text-on-surface mb-1">Weight Bearing</h4>
-                <p className="font-body-md text-body-md text-on-surface-variant">Weight-bearing as tolerated (WBAT) with crutches. Aim for 50% body weight transition by day 10.</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-surface-container text-on-surface-variant font-mono-data text-[11px] rounded">CRUTCHES REQ</span>
-                  <span className="px-2 py-1 bg-surface-container text-on-surface-variant font-mono-data text-[11px] rounded">SYMMETRY &lt; 30%</span>
+            {currentPhaseData.exercises?.length > 0 ? currentPhaseData.exercises.map((ex, index) => (
+              <div key={index} className="flex items-start space-x-4">
+                <div className="w-8 h-8 rounded bg-surface-container-low border border-outline-variant flex items-center justify-center shrink-0 mt-1">
+                  <span className="font-mono-data text-mono-data text-on-surface">{(index + 1).toString().padStart(2, '0')}</span>
+                </div>
+                <div>
+                  <h4 className="font-label-md text-label-md text-on-surface mb-1">{ex.name}</h4>
+                  <p className="font-body-md text-body-md text-on-surface-variant">
+                    {ex.sets} sets of {ex.reps} reps
+                  </p>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant opacity-80 mt-1">
+                    Frequency: {ex.frequency}
+                  </p>
                 </div>
               </div>
-            </div>
-            
-            {/* Instruction Group 3 */}
-            <div className="flex items-start space-x-4">
-              <div className="w-8 h-8 rounded bg-surface-container-low border border-outline-variant flex items-center justify-center shrink-0 mt-1">
-                <span className="font-mono-data text-mono-data text-on-surface">03</span>
-              </div>
-              <div>
-                <h4 className="font-label-md text-label-md text-on-surface mb-1">Cryotherapy Regimen</h4>
-                <p className="font-body-md text-body-md text-on-surface-variant">Apply compression icing 20 minutes every 2 hours while awake to manage effusion.</p>
-              </div>
-            </div>
+            )) : (
+              <p className="text-on-surface-variant">No specific exercises listed for this phase.</p>
+            )}
           </div>
         </div>
 

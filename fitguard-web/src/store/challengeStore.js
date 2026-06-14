@@ -28,6 +28,17 @@ export const useChallengeStore = create((set) => ({
     }
   },
 
+  fetchChallengeById: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const data = await challengeService.getChallengeById(id);
+      return data;
+    } catch (err) {
+      set({ error: err.message || 'Failed to fetch challenge', loading: false });
+      throw err;
+    }
+  },
+
   generateChallenge: async (params) => {
     set({ loading: true, error: null });
     try {

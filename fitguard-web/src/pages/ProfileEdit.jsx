@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProfileStore } from '../store/profileStore';
+import apiClient from '../services/apiClient';
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Full Name is required'),
@@ -74,11 +75,11 @@ export default function ProfileEdit() {
             
             {/* Avatar Section */}
             <div className="flex items-center gap-6 pb-8 border-b border-surface-container-high">
-              <div className="relative w-24 h-24 rounded-full overflow-hidden border border-outline-variant bg-surface-container-low group cursor-pointer">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden border border-outline-variant bg-surface-container-low group cursor-pointer" onClick={() => document.getElementById('avatarUpload').click()}>
                 <img 
                   alt="Current Profile Picture" 
                   className="w-full h-full object-cover group-hover:opacity-75 transition-opacity" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzkpif81MicB9laE_ctyLK-nanl1Huuevw-cnnhUbPbgKYCEkdiM3x3hDOvBp3OfpvNBuMWvj24hY8KHx5Tgqcsfd0I3JiIqi35t1bWrjDDWRyoXDNZUJ2rneuo0hLraIcOe2zBZv55nQ5aaxVHHYLv5Mb5e_I5fF2Z_xf7MzHm60uS59NXib4mMZXY9uDfRlKqsRYTcSsIvMyewqKxwy9sf53u5puNbKI8FgI5gURGh24fSSU-WwAzIqDeCV3VS_MSHYRuNN48rw"
+                  src={profile?.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuBzkpif81MicB9laE_ctyLK-nanl1Huuevw-cnnhUbPbgKYCEkdiM3x3hDOvBp3OfpvNBuMWvj24hY8KHx5Tgqcsfd0I3JiIqi35t1bWrjDDWRyoXDNZUJ2rneuo0hLraIcOe2zBZv55nQ5aaxVHHYLv5Mb5e_I5fF2Z_xf7MzHm60uS59NXib4mMZXY9uDfRlKqsRYTcSsIvMyewqKxwy9sf53u5puNbKI8FgI5gURGh24fSSU-WwAzIqDeCV3VS_MSHYRuNN48rw"}
                 />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-on-background/20">
                   <span className="material-symbols-outlined text-white">photo_camera</span>
@@ -87,7 +88,38 @@ export default function ProfileEdit() {
               <div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Profile Picture</h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant mb-3">High-resolution images help in visual gait analysis. JPG or PNG, max 5MB.</p>
-                <button className="font-label-md text-label-md text-primary border border-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2" type="button">
+                <input 
+                  type="file" 
+                  id="avatarUpload" 
+                  className="hidden" 
+                  accept="image/jpeg, image/png"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const formData = new FormData();
+                    formData.append('file', file);
+                      try {
+                        const res = await apiClient.post('/uploads', formData, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        
+                        if (res.data && res.data.url) {
+                          await updateProfile({ avatarUrl: res.data.url });
+                          alert('Profile picture updated!');
+                        } else {
+                          alert('Upload failed: Missing URL from server');
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        alert('Upload error: ' + (err.response?.data?.message || err.message));
+                      }
+                  }}
+                />
+                <button 
+                  className="font-label-md text-label-md text-primary border border-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2" 
+                  type="button"
+                  onClick={() => document.getElementById('avatarUpload').click()}
+                >
                   <span className="material-symbols-outlined text-[18px]">upload</span>
                   Upload New Photo
                 </button>

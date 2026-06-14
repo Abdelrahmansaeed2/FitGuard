@@ -4,7 +4,7 @@ import { authService } from '../services/authService';
 
 export const useAuthStore = create(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       refreshToken: null,
@@ -44,6 +44,17 @@ export const useAuthStore = create(
           console.error('Session refresh failed', error);
           set({ user: null, token: null, isAuthenticated: false });
         }
+      },
+
+      updatePassword: async (passwords) => {
+        set({ loading: true, error: null });
+        try {
+          await authService.updatePassword(passwords);
+          set({ loading: false });
+        } catch (err) {
+          set({ error: err.response?.data?.message || err.message || 'Failed to update password', loading: false });
+          throw err;
+        }
       }
     }),
     {
@@ -55,7 +66,7 @@ export const useAuthStore = create(
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated
       }),
-      onRehydrateStorage: () => (state, error) => {
+      onRehydrateStorage: () => (state) => {
         if (state) {
           state.setHasHydrated(true);
         }

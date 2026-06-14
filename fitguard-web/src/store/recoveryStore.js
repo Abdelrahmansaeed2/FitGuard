@@ -28,6 +28,17 @@ export const useRecoveryStore = create((set) => ({
     }
   },
 
+  fetchProtocolById: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const data = await recoveryService.getRecoveryById(id);
+      return data;
+    } catch (err) {
+      set({ error: err.message || 'Failed to fetch protocol', loading: false });
+      throw err;
+    }
+  },
+
   generateProtocol: async (params) => {
     set({ loading: true, error: null });
     try {
