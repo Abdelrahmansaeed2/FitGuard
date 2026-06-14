@@ -14,8 +14,8 @@ if (missingEnv.length > 0) {
   process.exit(1);
 }
 
-if (!process.env.OPENAI_API_KEY) {
-  console.warn('[Warning]: OPENAI_API_KEY is not defined. AI progressive sports challenges and recovery plans generation will fail.');
+if (!process.env.XAI_API_KEY) {
+  console.warn('[Warning]: XAI_API_KEY is not defined. AI progressive sports challenges and recovery plans generation will fail.');
 }
 
 connectDB();

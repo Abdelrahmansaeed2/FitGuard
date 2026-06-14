@@ -1,21 +1,40 @@
-const { OpenAI } = require('openai');
+const XAI_BASE_URL = process.env.XAI_BASE_URL || 'https://api.x.ai/v1';
+const XAI_MODEL = process.env.XAI_MODEL || 'grok-2';
 
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
+const hasApiKey = () => !!process.env.XAI_API_KEY;
 
-const hasApiKey = () => !!process.env.OPENAI_API_KEY;
-
-let openaiClient = null;
-
-const getClient = () => {
-  const apiKey = process.env.OPENAI_API_KEY;
+async function makeXaiRequest(messages, options = {}) {
+  const apiKey = process.env.XAI_API_KEY;
   if (!apiKey) {
-    throw new Error('OPENAI_API_KEY is not configured. Please add it to your environment variables.');
+    throw new Error('XAI_API_KEY is not configured. Please add it to your environment variables.');
   }
-  if (!openaiClient) {
-    openaiClient = new OpenAI({ apiKey });
+
+  const { timeout, ...restOptions } = options;
+  const baseUrlCleaned = XAI_BASE_URL.replace(/\/$/, '');
+  const url = `${baseUrlCleaned}/chat/completions`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: XAI_MODEL,
+      messages,
+      response_format: { type: 'json_object' },
+      temperature: 0.2,
+      ...restOptions
+    }),
+    signal: timeout ? AbortSignal.timeout(timeout) : undefined
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text().catch(() => '');
+    throw new Error(`xAI API returned status ${response.status}: ${errorBody || response.statusText}`);
   }
-  return openaiClient;
-};
+
+  return response.json();
+}
 
 function parseCleanJson(text) {
   let cleaned = text.trim();
@@ -251,56 +270,40 @@ function generateMockRecoveryProtocol(injuryLog, context) {
 
 async function generateChallenge(context) {
   if (!hasApiKey()) {
-    console.warn('[AI Mock Mode]: OPENAI_API_KEY is missing. Generating a mocked 30-day challenge plan.');
+    console.warn('[AI Mock Mode]: XAI_API_KEY is missing. Generating a mocked 30-day challenge plan.');
     return generateMockChallenge(context);
   }
 
   try {
-    const openai = getClient();
+    const responseData = await makeXaiRequest([
+      { role: 'system', content: getChallengeSystemPrompt() },
+      { role: 'user', content: getChallengeUserPrompt(context) }
+    ], { timeout: 15000 });
 
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [
-        { role: 'system', content: getChallengeSystemPrompt() },
-        { role: 'user', content: getChallengeUserPrompt(context) }
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.2,
-      timeout: 15000
-    });
-
-    const contentText = response.choices[0].message.content;
+    const contentText = responseData.choices[0].message.content;
     return parseCleanJson(contentText);
   } catch (error) {
-    console.warn('OpenAI challenge generation failed, falling back to mock data:', error.message);
+    console.warn('xAI challenge generation failed, falling back to mock data:', error.message);
     return generateMockChallenge(context);
   }
 }
 
 async function generateRecoveryProtocol(injuryLog, context) {
   if (!hasApiKey()) {
-    console.warn('[AI Mock Mode]: OPENAI_API_KEY is missing. Generating a mocked recovery protocol.');
+    console.warn('[AI Mock Mode]: XAI_API_KEY is missing. Generating a mocked recovery protocol.');
     return generateMockRecoveryProtocol(injuryLog, context);
   }
 
   try {
-    const openai = getClient();
+    const responseData = await makeXaiRequest([
+      { role: 'system', content: getRecoverySystemPrompt() },
+      { role: 'user', content: getRecoveryUserPrompt(injuryLog, context) }
+    ], { timeout: 15000 });
 
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [
-        { role: 'system', content: getRecoverySystemPrompt() },
-        { role: 'user', content: getRecoveryUserPrompt(injuryLog, context) }
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.2,
-      timeout: 15000
-    });
-
-    const contentText = response.choices[0].message.content;
+    const contentText = responseData.choices[0].message.content;
     return parseCleanJson(contentText);
   } catch (error) {
-    console.warn('OpenAI recovery protocol generation failed, falling back to mock data:', error.message);
+    console.warn('xAI recovery protocol generation failed, falling back to mock data:', error.message);
     return generateMockRecoveryProtocol(injuryLog, context);
   }
 }
