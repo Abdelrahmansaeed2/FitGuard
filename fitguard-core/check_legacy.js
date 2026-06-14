@@ -15,10 +15,10 @@ async function run() {
     ]
   });
   console.log(`Legacy records found: ${legacyCount}`);
-  
+
   const allProtocols = await RecoveryProtocol.find({});
   console.log(`Total records: ${allProtocols.length}`);
-  
+
   process.exit(0);
 }
 
