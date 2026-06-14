@@ -3,24 +3,52 @@ import { useRecoveryStore } from '../store/recoveryStore';
 import { Link } from 'react-router-dom';
 
 export default function ActiveRecovery() {
-  const { activeProtocol, fetchActiveProtocol, completePhase } = useRecoveryStore();
+  const { activeProtocol, loading, error, fetchActiveProtocol, completePhase } = useRecoveryStore();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     fetchActiveProtocol();
   }, [fetchActiveProtocol]);
 
-  if (!activeProtocol) {
-    return <div className="p-8 text-center">No active recovery protocol found. <Link to="/injuries" className="text-primary underline">View Injuries</Link></div>;
+  // Case 5: API request failed
+  if (error) {
+    return <div className="p-8 text-center text-error">Failed to load protocol: {error}. Please refresh or try again later.</div>;
+  }
+
+  // Case: Still loading initial data
+  if (loading && activeProtocol === null) {
+    return <div className="p-8 text-center">Loading recovery protocol...</div>;
+  }
+
+  // Case 1, 2, 6: No active recovery exists
+  if (!activeProtocol || Array.isArray(activeProtocol)) {
+    return (
+      <div className="p-8 text-center">
+        <div className="mb-4 material-symbols-outlined text-6xl text-outline-variant">healing</div>
+        <h2 className="text-xl font-headline-md mb-2">No Active Recovery Protocol</h2>
+        <p className="text-on-surface-variant mb-4">You don't have any active recovery plans at the moment.</p>
+        <Link to="/injuries" className="text-on-primary bg-primary px-6 py-2 rounded-lg inline-block">View Injuries</Link>
+      </div>
+    );
+  }
+
+  // Case 3, 4: Invalid phases array
+  if (!activeProtocol.phases || !Array.isArray(activeProtocol.phases) || activeProtocol.phases.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-xl font-headline-md mb-2 text-error">Invalid Protocol Data</h2>
+        <p className="text-on-surface-variant">This protocol is missing its phases. Please contact support or generate a new protocol.</p>
+      </div>
+    );
   }
 
   const handleCompletePhase = async () => {
-    await completePhase(activeProtocol.id, activeProtocol.currentPhase);
+    await completePhase(activeProtocol._id || activeProtocol.id, activeProtocol.currentPhase);
     setShowSuccessModal(true);
   };
 
   const currentPhaseIndex = activeProtocol.phases.findIndex(p => p.phaseNumber === activeProtocol.currentPhase);
-  const currentPhaseData = activeProtocol.phases[currentPhaseIndex];
+  const currentPhaseData = currentPhaseIndex >= 0 ? activeProtocol.phases[currentPhaseIndex] : activeProtocol.phases[activeProtocol.phases.length - 1];
   const injury = activeProtocol.injuryLogId;
 
   return (

@@ -105,13 +105,13 @@ exports.getProtocols = async (req, res, next) => {
 
 exports.getActiveProtocols = async (req, res, next) => {
   try {
-    const protocols = await RecoveryProtocol.find({ userId: req.user._id, status: 'active' })
+    const protocol = await RecoveryProtocol.findOne({ userId: req.user._id, status: 'active' })
       .populate('injuryLogId');
 
     res.status(200).json({
       success: true,
-      data: protocols,
-      message: 'Active recovery protocols retrieved successfully'
+      data: protocol || null,
+      message: protocol ? 'Active recovery protocol retrieved successfully' : 'No active recovery protocol found'
     });
   } catch (err) {
     next(err);
