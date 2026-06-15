@@ -158,7 +158,7 @@ export default function Dashboard() {
             </div>
             <span className="px-2 py-1 bg-secondary/10 text-secondary font-label-md text-label-md rounded">Active Initiative</span>
           </div>
-          {activeChallenge.status == "active" ? (
+          {activeChallenge?.status == "active" ? (
             <>
               <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2 capitalize">{activeChallenge.sport} Protocol</h3>
               <p className="font-body-sm text-body-sm text-on-surface-variant mb-6 capitalize">{activeChallenge.difficulty} difficulty AI plan.</p>
