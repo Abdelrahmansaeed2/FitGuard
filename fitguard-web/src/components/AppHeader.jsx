@@ -15,16 +15,9 @@ export default function AppHeader() {
         </button>
       </div>
 
-      <div className="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-surface-variant focus-within:border-outline transition-colors w-64">
-        <span className="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
-        <input 
-          type="text" 
-          className="bg-transparent border-none focus:ring-0 text-body-sm font-body-sm w-full placeholder-on-surface-variant text-on-surface outline-none" 
-          placeholder="Search athletes, metrics..." 
-        />
-      </div>
 
-      <div className="flex items-center space-x-2 ml-auto md:ml-0">
+
+      <div className="flex items-center space-x-2 ml-auto">
         <Link to="/notifications" className="relative text-on-surface-variant hover:bg-surface-container-high rounded-full p-2 transition-transform duration-200 hover:scale-105 active:scale-95 flex items-center justify-center">
           <span className="material-symbols-outlined text-primary">notifications</span>
           {unreadCount > 0 && (

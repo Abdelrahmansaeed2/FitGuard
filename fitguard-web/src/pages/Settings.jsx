@@ -17,7 +17,7 @@ const passwordSchema = z.object({
 
 export default function Settings() {
   const { user, updatePassword } = useAuthStore();
-  const { profile, fetchProfile, updateSettings, updateDevices } = useProfileStore();
+  const { profile, fetchProfile, updateSettings } = useProfileStore();
   
   const [toggles, setToggles] = useState({
     alerts: true,
@@ -79,17 +79,7 @@ export default function Settings() {
     }
   };
 
-  const handleDisconnectDevice = async (deviceName) => {
-    if (profile?.connectedDevices) {
-      const newDevices = profile.connectedDevices.filter(d => d.name !== deviceName);
-      await updateDevices(newDevices);
-    }
-  };
 
-  const handleConnectDevice = async (deviceName) => {
-    const newDevices = [...(profile?.connectedDevices || []), { name: deviceName, lastSync: new Date().toISOString() }];
-    await updateDevices(newDevices);
-  };
 
   if (!profile || !user) {
     return <div className="p-8 text-center">Loading settings...</div>;
@@ -197,74 +187,7 @@ export default function Settings() {
           {/* Right Column: Integrations & Notifications (Spans 5 cols) */}
           <div className="lg:col-span-5 space-y-6">
             
-            {/* Linked Biometrics (Wearables) */}
-            <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
-              <h3 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-primary">watch</span>
-                Linked Biometrics
-              </h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">Connect wearable devices for continuous recovery monitoring.</p>
-              
-              <div className="space-y-4">
-                {/* WHOOP Integration (Active) */}
-                {profile.connectedDevices?.find(d => d.name === 'WHOOP') ? (
-                  <div className="flex items-center justify-between p-4 bg-surface-container border border-outline-variant rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-on-surface rounded-md flex items-center justify-center text-surface-container-lowest font-headline-sm font-bold">W</div>
-                      <div>
-                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">WHOOP</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-primary-container inline-block"></span> Syncing Active
-                        </p>
-                      </div>
-                    </div>
-                    <button onClick={() => handleDisconnectDevice('WHOOP')} className="font-label-md text-label-md px-3 py-1 border border-outline-variant text-on-surface rounded hover:bg-surface-container-high transition-colors">Disconnect</button>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between p-4 bg-surface border border-outline-variant rounded-lg opacity-80">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-on-surface rounded-md flex items-center justify-center text-surface-container-lowest font-headline-sm font-bold">W</div>
-                      <div>
-                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">WHOOP</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">Not connected</p>
-                      </div>
-                    </div>
-                    <button onClick={() => handleConnectDevice('WHOOP')} className="font-label-md text-label-md px-3 py-1 bg-surface-container text-on-surface rounded hover:bg-surface-container-high transition-colors">Connect</button>
-                  </div>
-                )}
 
-                {/* Garmin Integration (Inactive) */}
-                {profile.connectedDevices?.find(d => d.name === 'Garmin Connect') ? (
-                  <div className="flex items-center justify-between p-4 bg-surface-container border border-outline-variant rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-[#000] rounded-md flex items-center justify-center">
-                        <span className="material-symbols-outlined text-white">sports_score</span>
-                      </div>
-                      <div>
-                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">Garmin Connect</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-primary-container inline-block"></span> Syncing Active
-                        </p>
-                      </div>
-                    </div>
-                    <button onClick={() => handleDisconnectDevice('Garmin Connect')} className="font-label-md text-label-md px-3 py-1 border border-outline-variant text-on-surface rounded hover:bg-surface-container-high transition-colors">Disconnect</button>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between p-4 bg-surface border border-outline-variant rounded-lg opacity-80">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-[#000] rounded-md flex items-center justify-center">
-                        <span className="material-symbols-outlined text-white">sports_score</span>
-                      </div>
-                      <div>
-                        <p className="font-headline-sm text-headline-sm text-on-surface text-base">Garmin Connect</p>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">Not connected</p>
-                      </div>
-                    </div>
-                    <button onClick={() => handleConnectDevice('Garmin Connect')} className="font-label-md text-label-md px-3 py-1 bg-surface-container text-on-surface rounded hover:bg-surface-container-high transition-colors">Connect</button>
-                  </div>
-                )}
-              </div>
-            </section>
 
             {/* Notification Preferences */}
             <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
