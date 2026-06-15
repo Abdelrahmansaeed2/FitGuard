@@ -22,8 +22,7 @@ export default function Dashboard() {
   } // eslint-disable-next-line react-hooks/exhaustive-deps
   , []);
 
-  const lastBiometric = stats?.biometricsHistory?.[stats.biometricsHistory.length - 1];
-  const recoveryScore = lastBiometric ? lastBiometric.score : null;
+  const activityScore = stats?.activityScore ?? null;
   const currentPhaseStr = activeProtocol ? `Protocol Phase ${activeProtocol.currentPhase}` : activeChallenge ? `Challenge Day ${activeChallenge.generatedPlan?.findIndex(d => !d.completed) + 1 || 1}` : 'Maintenance';
 
   return (
@@ -88,13 +87,13 @@ export default function Dashboard() {
           
           <div className="mt-6">
             <div className="flex justify-between items-end mb-2">
-              <span className="font-headline-sm text-headline-sm text-on-surface">Recovery Score</span>
-              <span className="font-display-md text-display-md text-primary-container leading-none">{recoveryScore !== null ? recoveryScore : '--'}<span className="text-headline-sm text-on-surface-variant ml-1">%</span></span>
+              <span className="font-headline-sm text-headline-sm text-on-surface">Activity Completion</span>
+              <span className="font-display-md text-display-md text-primary-container leading-none">{activityScore !== null ? activityScore : '--'}<span className="text-headline-sm text-on-surface-variant ml-1">%</span></span>
             </div>
             <div className="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
-              <div className="h-full bg-primary-container rounded-full" style={{ width: `${recoveryScore !== null ? recoveryScore : 0}%` }}></div>
+              <div className="h-full bg-primary-container rounded-full" style={{ width: `${activityScore !== null ? activityScore : 0}%` }}></div>
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-2">{recoveryScore !== null ? 'Optimal readiness based on biometrics.' : 'Sync a device to view your recovery score.'}</p>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-2">7-day task completion rate.</p>
           </div>
         </div>
 
@@ -102,32 +101,32 @@ export default function Dashboard() {
         <div className="md:col-span-8 bg-surface-container-lowest border border-surface-variant hover:border-outline-variant transition-colors rounded-xl p-6 relative overflow-hidden">
           <div className="flex justify-between items-center mb-6 relative z-10">
             <div>
-              <h2 className="font-headline-sm text-headline-sm text-on-surface">Biometric Trends</h2>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">HRV vs. Sleep Quality (Last 7 Days)</p>
+              <h2 className="font-headline-sm text-headline-sm text-on-surface">Activity Trends</h2>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">Assigned vs. Completed Tasks (Last 7 Days)</p>
             </div>
             <div className="flex space-x-2">
-              <span className="flex items-center text-body-sm font-body-sm text-on-surface-variant"><span className="w-2 h-2 rounded-full bg-secondary mr-2"></span>HRV</span>
-              <span className="flex items-center text-body-sm font-body-sm text-on-surface-variant"><span className="w-2 h-2 rounded-full bg-primary-container mr-2"></span>Sleep</span>
+              <span className="flex items-center text-body-sm font-body-sm text-on-surface-variant"><span className="w-2 h-2 rounded-full bg-secondary mr-2"></span>Assigned</span>
+              <span className="flex items-center text-body-sm font-body-sm text-on-surface-variant"><span className="w-2 h-2 rounded-full bg-primary-container mr-2"></span>Completed</span>
             </div>
           </div>
           
           {/* Chart Bars/Lines Simulation */}
           <div className="h-[240px] w-full flex items-end justify-between space-x-2 relative z-10 pb-6 border-b border-surface-variant">
             <div className="w-full flex justify-between items-end h-full px-4">
-              {stats?.biometricsHistory && stats.biometricsHistory.length > 0 ? (
-                stats.biometricsHistory.map((data, index) => (
+              {stats?.activityHistory && stats.activityHistory.length > 0 ? (
+                stats.activityHistory.map((data, index) => (
                   <div key={index} className="flex flex-col items-center space-y-2 relative group cursor-pointer">
                     <div className="absolute -top-10 bg-on-background text-surface px-2 py-1 rounded text-[10px] font-mono-data opacity-0 group-hover:opacity-100 transition-opacity z-20 whitespace-nowrap">
-                      Score: {data.score}
+                      {data.completed} / {data.assigned} Completed
                     </div>
                     <div className="flex space-x-0.5 items-end">
                       <div 
                         className="w-3 bg-secondary/80 rounded-t-sm" 
-                        style={{ height: `${data.hrv}px` }}
+                        style={{ height: `${data.assigned * 20}px` }}
                       ></div>
                       <div 
                         className="w-3 bg-primary-container/80 rounded-t-sm" 
-                        style={{ height: `${data.sleep * 10}px` }}
+                        style={{ height: `${data.completed * 20}px` }}
                       ></div>
                     </div>
                     <span className="font-mono-data text-[10px] text-on-surface-variant">{data.day}</span>
@@ -136,7 +135,7 @@ export default function Dashboard() {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center pt-8">
                   <span className="material-symbols-outlined text-surface-variant text-4xl mb-2">query_stats</span>
-                  <p className="text-on-surface-variant font-body-sm">No biometric history available.</p>
+                  <p className="text-on-surface-variant font-body-sm">No activity history available.</p>
                 </div>
               )}
             </div>

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useChallengeStore } from '../store/challengeStore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function ActiveChallenge() {
   const { activeChallenge, completeDay, toggleChallengeExercise, abandonChallenge } = useChallengeStore();
+  const navigate = useNavigate();
   const [view, setView] = useState('dashboard'); // 'dashboard' | 'tasks'
   const [showAbandonModal, setShowAbandonModal] = useState(false);
 
@@ -17,6 +18,9 @@ export default function ActiveChallenge() {
   
   const handleCompleteDay = async () => {
     await completeDay(activeChallenge.id || activeChallenge._id, currentDay);
+    if (currentDay === activeChallenge.generatedPlan.length) {
+      navigate('/dashboard');
+    }
   };
 
   const handleAbandonChallenge = async () => {
@@ -219,7 +223,7 @@ export default function ActiveChallenge() {
                     disabled={!allExercisesCompleted && totalExercises > 0}
                   >
                     <span className="material-symbols-outlined">{totalExercises === 0 ? 'skip_next' : 'check_circle'}</span>
-                    <span>{totalExercises === 0 ? 'Skip Rest Day' : 'Complete Day'}</span>
+                    <span>{totalExercises === 0 ? 'Skip Rest Day' : (currentDay === activeChallenge.generatedPlan.length ? 'Complete Challenge' : 'Complete Day')}</span>
                   </button>
                 </div>
               </div>
