@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 export default function Home() {
+  const { isAuthenticated } = useAuthStore();
   return (
     <>
       {/* Hero Section */}
@@ -8,7 +10,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-pattern opacity-50 z-0"></div>
         <div className="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-12 gap-gutter relative z-10">
           <div className="lg:col-span-6 flex flex-col justify-center pr-8">
-            <div className="inline-flex items-center space-x-2 bg-secondary-container bg-opacity-10 text-secondary px-3 py-1 rounded-full mb-6 w-fit">
+            <div className="inline-flex items-center space-x-2 bg-secondary-container bg-opacity-10 text-on-secondary-container px-3 py-1 rounded-full mb-6 w-fit">
               <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
               <span className="font-label-md text-label-md uppercase tracking-wider">AI-Powered Analytics</span>
             </div>
@@ -19,23 +21,24 @@ export default function Home() {
               Clinical precision meets elite performance. Track biometrics, predict injury risk, and execute AI-generated rehab plans tailored to your physiology.
             </p>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link to="/register" className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-label-md text-label-md hover:shadow-md transition-all text-center">
-                Start Your Recovery Journey
-              </Link>
-              <button className="bg-transparent border border-outline text-on-surface px-8 py-4 rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all">
-                View Demo
-              </button>
+              {isAuthenticated ? (
+                <Link to="/dashboard" className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-label-md text-label-md hover:shadow-md transition-all text-center">
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <Link to="/register" className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-label-md text-label-md hover:shadow-md transition-all text-center">
+                  Start Your Recovery Journey
+                </Link>
+              )}
             </div>
           </div>
           
           <div className="lg:col-span-6 relative mt-16 lg:mt-0">
             {/* High-performance imagery */}
-            <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-surface-container relative">
-              <img 
-                alt="Professional athlete running" 
-                className="object-cover w-full h-full" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAofFVMRKe-_YcU2UEvT394tpYvRLS1ks-_p-DQpp5q2oihFULfuEFPrQ7Fr1mLdirZFax11r4dH-KnDBidYoYbbVBtMFde6NOJgSw23tXaPEAgDhr7nSxxB4kBOLVTTmzon0Mu3mI18BkLysXR7LAcCs4U4Zfa-Dj8ziT7yPc3w9GTtTlLeGr6C58mESYJXGPpSB-f9QSrWABGzQG_L8WywpvyosPYXbHaaGTQRZhiDota3lth2uuGFkTlwCznLtsFm_Yqk0oRV6Q"
-              />
+            <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-surface-container relative shadow-2xl">
+              <img src="/hero-bg.png" alt="Athlete training with biometric tracking" className="absolute inset-0 w-full h-full object-cover" />
+              {/* Subtle color overlay */}
+              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary via-transparent to-surface-container mix-blend-overlay"></div>
               {/* Floating Data Card */}
               <div className="absolute bottom-6 left-6 bg-surface-container-lowest border border-outline-variant p-4 rounded-xl shadow-lg w-64 backdrop-blur-md bg-opacity-90">
                 <div className="flex justify-between items-center mb-2">
@@ -91,7 +94,7 @@ export default function Home() {
             <div className="md:col-span-4 bg-surface border border-outline-variant rounded-2xl p-8 hover:border-outline transition-colors flex flex-col justify-between">
               <div>
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="bg-secondary-container bg-opacity-20 text-secondary p-3 rounded-lg">
+                  <div className="bg-secondary-container bg-opacity-20 text-on-secondary-container p-3 rounded-lg">
                     <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
                   </div>
                   <h3 className="font-headline-md text-headline-md text-on-surface">AI Rehab Plans</h3>

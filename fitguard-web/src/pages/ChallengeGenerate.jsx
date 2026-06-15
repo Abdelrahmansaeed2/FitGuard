@@ -52,7 +52,11 @@ export default function ChallengeGenerate() {
       await generateChallenge(data);
       navigate('/challenges/active');
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Failed to generate challenge.');
+      let errorMsg = err.response?.data?.message || 'Failed to generate challenge.';
+      if (errorMsg.includes('Invalid input') || errorMsg.includes('expected string')) {
+        errorMsg = 'Our AI service experienced a formatting hiccup. Please try generating again.';
+      }
+      setServerError(errorMsg);
       setIsGenerating(false);
     }
   };

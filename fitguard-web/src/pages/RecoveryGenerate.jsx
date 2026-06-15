@@ -7,7 +7,10 @@ import { useInjuryStore } from '../store/injuryStore';
 import { useRecoveryStore } from '../store/recoveryStore';
 
 const generateSchema = z.object({
-  injuryLogId: z.string().min(1, 'Please select an injury to generate a protocol for')
+  injuryLogId: z.string({
+    required_error: 'Please select an injury to generate a protocol for',
+    invalid_type_error: 'Please select an injury to generate a protocol for'
+  }).min(1, 'Please select an injury to generate a protocol for')
 });
 
 export default function RecoveryGenerate() {
@@ -57,7 +60,11 @@ export default function RecoveryGenerate() {
       await generateProtocol(data);
       navigate('/recovery/active');
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Failed to generate protocol.');
+      let errorMsg = err.response?.data?.message || 'Failed to generate protocol.';
+      if (errorMsg.includes('Invalid input') || errorMsg.includes('expected string')) {
+        errorMsg = 'Our AI service experienced a formatting hiccup. Please try generating again.';
+      }
+      setServerError(errorMsg);
       setIsGenerating(false);
     }
   };
@@ -80,7 +87,7 @@ export default function RecoveryGenerate() {
             </div>
           )}
           {errors.injuryLogId && (
-            <p className="text-error text-label-md mb-4 text-center">{errors.injuryLogId.message}</p>
+            <p className="text-error text-label-md mb-4 text-center">Please select an injury to generate a protocol for.</p>
           )}
 
           <div className="flex flex-col gap-4 mb-8 max-h-[300px] overflow-y-auto pr-2">

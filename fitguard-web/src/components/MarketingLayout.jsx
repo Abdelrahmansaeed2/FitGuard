@@ -50,13 +50,9 @@ export default function MarketingLayout({ children }) {
             FitGuard
           </div>
           <div className="flex flex-wrap justify-center gap-6 mb-6 md:mb-0">
-            <Link to="/privacy" className="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">Terms of Service</Link>
-            <a href="#" className="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">HIPAA Compliance</a>
-            <a href="#" className="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">API Documentation</a>
           </div>
           <div className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant">
-            © 2024 FitGuard AI. Clinical Precision in Motion.
+            © FitGuard AI. Clinical Precision in Motion.
           </div>
         </div>
       </footer>

@@ -38,38 +38,42 @@ export default function RecoveryProtocolList() {
           {/* Bento Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Active Protocol Overview (Spans 8 columns) */}
-            <div className="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 relative overflow-hidden flex flex-col justify-between">
-              {/* Decorative ambient gradient */}
-              <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary-container opacity-20 blur-3xl rounded-full pointer-events-none"></div>
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <span className="px-3 py-1 bg-surface-container-highest text-on-surface rounded-full font-label-md text-label-md mb-3 inline-block">Active Protocol</span>
-                    <h3 className="font-headline-lg text-headline-lg text-on-background capitalize">{injury?.muscleGroup} {injury?.injuryType}</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-lg">{currentPhaseData?.name} - {currentPhaseData?.durationDays} Days</p>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-inverse-on-surface px-4 py-2 rounded-lg border border-outline-variant">
-                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 0" }}>timeline</span>
-                    <div>
-                      <p className="font-label-md text-label-md text-on-surface-variant">Current Phase</p>
-                      <p className="font-headline-sm text-headline-sm text-on-background">Phase {activeProtocol.currentPhase} / {activeProtocol.phases?.length}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Progress Timeline */}
-              <div className="mt-8">
-                <div className="flex justify-between font-label-md text-label-md text-on-surface-variant mb-2">
-                  <span>Phase Progress</span>
-                  <span className="text-primary font-bold">In Progress</span>
-                </div>
-                <div className="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-1/3 rounded-full relative">
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-r from-transparent to-white opacity-30 animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Active Protocol Overview (Spans 8 columns) */}
+<Link 
+  to="/recovery/active" 
+  className="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 relative overflow-hidden flex flex-col justify-between cursor-pointer transition-all hover:border-primary hover:shadow-md hover:-translate-y-0.5"
+>
+  {/* Decorative ambient gradient */}
+  <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary-container opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+  <div>
+    <div className="flex justify-between items-start mb-6">
+      <div>
+        <span className="px-3 py-1 bg-surface-container-highest text-on-surface rounded-full font-label-md text-label-md mb-3 inline-block">Active Protocol</span>
+        <h3 className="font-headline-lg text-headline-lg text-on-background capitalize">{injury?.muscleGroup} {injury?.injuryType}</h3>
+        <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-lg">{currentPhaseData?.name} - {currentPhaseData?.durationDays} Days</p>
+      </div>
+      <div className="flex items-center space-x-2 bg-inverse-on-surface px-4 py-2 rounded-lg border border-outline-variant">
+        <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 0" }}>timeline</span>
+        <div>
+          <p className="font-label-md text-label-md text-on-surface-variant">Current Phase</p>
+          <p className="font-headline-sm text-headline-sm text-on-background">Phase {activeProtocol.currentPhase} / {activeProtocol.phases?.length}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {/* Progress Timeline */}
+  <div className="mt-8">
+    <div className="flex justify-between font-label-md text-label-md text-on-surface-variant mb-2">
+      <span>Phase Progress</span>
+      <span className="text-primary font-bold">In Progress</span>
+    </div>
+    <div className="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
+      <div className="h-full bg-primary w-1/3 rounded-full relative">
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-r from-transparent to-white opacity-30 animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+</Link>
 
             {/* Daily Status/Readiness (Spans 4 columns) */}
             <div className="md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col">

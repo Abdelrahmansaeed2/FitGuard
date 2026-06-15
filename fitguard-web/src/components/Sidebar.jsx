@@ -21,7 +21,7 @@ export default function Sidebar() {
       <div className="mb-8 px-4 flex items-center space-x-3 mt-4">
         <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>health_and_safety</span>
         <div className="flex flex-col">
-          <span className="font-headline-sm text-headline-sm font-black text-primary">FitGuard Pro</span>
+          <span className="font-headline-sm text-headline-sm font-black text-primary">FitGuard</span>
           <span className="font-label-md text-label-md text-on-surface-variant">Elite Performance</span>
         </div>
       </div>
@@ -52,10 +52,7 @@ export default function Sidebar() {
         <span>New Analysis</span>
       </Link>
       <div className="mt-auto pt-4 border-t border-surface-container-low space-y-1">
-        <Link className="flex items-center space-x-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-xl" to="/faq">
-          <span className="material-symbols-outlined">help</span>
-          <span className="font-label-md text-label-md">Support</span>
-        </Link>
+
         <button 
           onClick={logout}
           className="w-full flex items-center space-x-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-xl text-left"

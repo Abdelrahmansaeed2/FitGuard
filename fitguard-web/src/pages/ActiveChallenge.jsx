@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useChallengeStore } from '../store/challengeStore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function ActiveChallenge() {
   const { activeChallenge, completeDay, toggleChallengeExercise, abandonChallenge } = useChallengeStore();
+  const navigate = useNavigate();
   const [view, setView] = useState('dashboard'); // 'dashboard' | 'tasks'
   const [showAbandonModal, setShowAbandonModal] = useState(false);
 
@@ -17,6 +18,9 @@ export default function ActiveChallenge() {
   
   const handleCompleteDay = async () => {
     await completeDay(activeChallenge.id || activeChallenge._id, currentDay);
+    if (currentDay === activeChallenge.generatedPlan.length) {
+      navigate('/dashboard');
+    }
   };
 
   const handleAbandonChallenge = async () => {
@@ -28,6 +32,8 @@ export default function ActiveChallenge() {
   const completedExercisesCount = exercises.filter(ex => ex.completed).length;
   const totalExercises = exercises.length;
   const allExercisesCompleted = totalExercises > 0 ? completedExercisesCount === totalExercises : false;
+  const totalDays = activeChallenge.generatedPlan.length;
+  const progressPercentage = totalDays > 0 ? Math.round((completedDaysCount / totalDays) * 100) : 0;
 
   return (
     <div className="p-margin-mobile md:p-margin-desktop bg-surface-bright min-h-[calc(100vh-64px)] overflow-y-auto">
@@ -61,11 +67,11 @@ export default function ActiveChallenge() {
                   {/* Background Circle */}
                   <path className="text-surface-container-highest stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeWidth="3"></path>
                   {/* Progress Circle - Note: adding style inline since keyframes are not in module */}
-                  <path className="text-secondary-container stroke-current" style={{ strokeDasharray: '45, 100', transition: 'stroke-dasharray 1.5s ease-out' }} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeLinecap="round" strokeWidth="3"></path>
+                  <path className="text-secondary-container stroke-current" style={{ strokeDasharray: `${progressPercentage}, 100`, transition: 'stroke-dasharray 1.5s ease-out' }} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeLinecap="round" strokeWidth="3"></path>
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="font-display-md text-display-md text-on-surface">{currentDay}</span>
-                  <span className="font-label-md text-label-md text-on-surface-variant">/ 30 Days</span>
+                  <span className="font-label-md text-label-md text-on-surface-variant">/ {totalDays} Days</span>
                 </div>
               </div>
               
@@ -91,7 +97,7 @@ export default function ActiveChallenge() {
                     </div>
                     <div>
                       <p className="font-label-md text-label-md text-on-surface-variant">Completion Rate</p>
-                      <p className="font-headline-md text-headline-md text-on-surface">{Math.round((completedDaysCount / 30) * 100)}%</p>
+                      <p className="font-headline-md text-headline-md text-on-surface">{progressPercentage}%</p>
                     </div>
                   </div>
                 </div>
@@ -160,7 +166,7 @@ export default function ActiveChallenge() {
                 Back to Dashboard
               </button>
               <h1 className="font-display-md text-display-md text-on-surface">Daily Challenge</h1>
-              <p className="font-body-lg text-body-lg text-on-surface-variant mt-1">Day {currentDay} of 30: {Math.ceil(currentDay / 10) === 1 ? 'Foundation' : Math.ceil(currentDay / 10) === 2 ? 'Adaptation' : 'Mastery'} Phase</p>
+              <p className="font-body-lg text-body-lg text-on-surface-variant mt-1">Day {currentDay} of {totalDays}: {Math.ceil(currentDay / 10) === 1 ? 'Foundation' : Math.ceil(currentDay / 10) === 2 ? 'Adaptation' : 'Mastery'} Phase</p>
             </div>
             <div className="flex items-center space-x-3 bg-secondary-container bg-opacity-10 px-4 py-2 rounded-full border border-secondary-container/20">
               <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
@@ -216,8 +222,8 @@ export default function ActiveChallenge() {
                     className="w-full bg-primary hover:bg-surface-tint text-on-primary font-headline-sm text-headline-sm py-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
                     disabled={!allExercisesCompleted && totalExercises > 0}
                   >
-                    <span className="material-symbols-outlined">check_circle</span>
-                    <span>Complete Day</span>
+                    <span className="material-symbols-outlined">{totalExercises === 0 ? 'skip_next' : 'check_circle'}</span>
+                    <span>{totalExercises === 0 ? 'Skip Rest Day' : (currentDay === activeChallenge.generatedPlan.length ? 'Complete Challenge' : 'Complete Day')}</span>
                   </button>
                 </div>
               </div>

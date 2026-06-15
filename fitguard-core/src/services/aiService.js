@@ -23,6 +23,7 @@ async function makeXaiRequest(messages, options = {}) {
       messages,
       response_format: { type: 'json_object' },
       temperature: 0.2,
+      max_tokens: 4000,
       ...restOptions
     }),
     signal: timeout ? AbortSignal.timeout(timeout) : undefined
@@ -57,7 +58,7 @@ You will receive a context object containing their target sport, requested diffi
 CRITICAL SAFETY RULES:
 1. AVOID exercises that stress actively injured muscle groups listed under "activeInjuries". Focus on safe alternatives or non-impact work for those areas.
 2. INCLUDE target strengthening, stability, and mobility exercises for repeatedly injured muscle groups listed under "recurringInjuries" to rehabilitate and protect them.
-3. The generated plan must consist of EXACTLY 30 days. No more, no less.
+3. The generated plan must consist of EXACTLY 30 days. No more, no less. You MUST output exactly 30 day objects.
 4. You must output ONLY a valid JSON object matching the schema below. No explanations, no conversation, and no markdown wrapper (except the JSON format itself).
 
 Expected JSON schema:
@@ -80,7 +81,7 @@ Expected JSON schema:
     }
   ]
 }
-Each day must specify a "day" number, a detailed "task" string, an array of targeted "muscleGroups", and the "difficulty" level.`;
+Each day must specify a "day" number, a detailed "task" string, an array of targeted "muscleGroups", and the "difficulty" level. You must provide all 30 days from day 1 to day 30 sequentially.`;
 }
 
 function getChallengeUserPrompt(context) {
@@ -268,6 +269,60 @@ function generateMockRecoveryProtocol(injuryLog, context) {
   };
 }
 
+function ensureThirtyDays(aiResult, context) {
+  if (!aiResult || typeof aiResult !== 'object') {
+    aiResult = {};
+  }
+  
+  if (!Array.isArray(aiResult.days)) {
+    aiResult.days = [];
+  }
+
+  let days = aiResult.days.filter(d => d && typeof d === 'object');
+
+  if (days.length === 0) {
+    console.warn('[AI Repair Mode]: No valid days array returned by AI. Falling back to mock.');
+    return generateMockChallenge(context);
+  }
+
+  if (days.length !== 30) {
+    console.warn(`[AI Repair Mode]: AI returned ${days.length} days instead of 30. Restructuring/padding to exactly 30 days.`);
+  }
+
+  // Ensure day numbers are sequential and valid
+  days.forEach((d, idx) => {
+    if (typeof d.day !== 'number' || isNaN(d.day)) {
+      d.day = idx + 1;
+    }
+  });
+
+  days.sort((a, b) => a.day - b.day);
+
+  const targetLength = 30;
+  const finalDays = [];
+
+  for (let i = 1; i <= targetLength; i++) {
+    const sourceDay = days[(i - 1) % days.length];
+
+    const clonedExercises = Array.isArray(sourceDay.exercises)
+      ? JSON.parse(JSON.stringify(sourceDay.exercises))
+      : [];
+
+    finalDays.push({
+      day: i,
+      task: sourceDay.task || `Perform core stability and light mobility exercises for athletic development.`,
+      muscleGroups: Array.isArray(sourceDay.muscleGroups) ? [...sourceDay.muscleGroups] : ['core', 'mobility'],
+      difficulty: sourceDay.difficulty || context.difficulty || 'intermediate',
+      exercises: clonedExercises
+    });
+  }
+
+  return {
+    ...aiResult,
+    days: finalDays
+  };
+}
+
 async function generateChallenge(context) {
   if (!hasApiKey()) {
     console.warn('[AI Mock Mode]: XAI_API_KEY is missing. Generating a mocked 30-day challenge plan.');
@@ -278,10 +333,11 @@ async function generateChallenge(context) {
     const responseData = await makeXaiRequest([
       { role: 'system', content: getChallengeSystemPrompt() },
       { role: 'user', content: getChallengeUserPrompt(context) }
-    ], { timeout: 15000 });
+    ], { timeout: 30000 });
 
     const contentText = responseData.choices[0].message.content;
-    return parseCleanJson(contentText);
+    const parsed = parseCleanJson(contentText);
+    return ensureThirtyDays(parsed, context);
   } catch (error) {
     console.warn('xAI challenge generation failed, falling back to mock data:', error.message);
     return generateMockChallenge(context);

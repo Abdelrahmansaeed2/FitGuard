@@ -147,12 +147,7 @@ export default function InjuryCreate() {
                 placeholder="Mechanism of injury: e.g., 'Felt a sharp pull in distal hamstring during explosive sprint acceleration phase...'" 
                 rows="6"
               ></textarea>
-              <div className="mt-3 flex justify-end">
-                <button className="flex items-center space-x-1 text-secondary hover:text-secondary-container transition-colors font-label-md text-label-md" type="button">
-                  <span className="material-symbols-outlined text-[16px]">psychiatry</span>
-                  <span>Generate AI Summary</span>
-                </button>
-              </div>
+
             </div>
 
           </div>
@@ -174,7 +169,7 @@ export default function InjuryCreate() {
                 <label className="cursor-pointer relative block">
                   <input {...register('severity')} className="peer sr-only severity-radio" type="radio" value="mild" />
                   <div className="severity-radio-label w-full border border-outline-variant rounded-lg p-4 flex items-center hover:bg-surface-container-low">
-                    <div className={`w-4 h-4 rounded-full border border-outline-variant mr-3 flex items-center justify-center ${severityValue === 'mild' ? 'bg-error border-error' : ''}`}>
+                    <div className={`flex-shrink-0 w-4 h-4 rounded-full border border-outline-variant mr-3 flex items-center justify-center ${severityValue === 'mild' ? 'bg-error border-error' : ''}`}>
                       <div className={`w-2 h-2 rounded-full bg-white ${severityValue === 'mild' ? 'opacity-100' : 'opacity-0'}`}></div>
                     </div>
                     <div>
@@ -188,7 +183,7 @@ export default function InjuryCreate() {
                 <label className="cursor-pointer relative block">
                   <input {...register('severity')} className="peer sr-only severity-radio" type="radio" value="moderate" />
                   <div className="severity-radio-label w-full border border-outline-variant rounded-lg p-4 flex items-center hover:bg-surface-container-low">
-                    <div className={`w-4 h-4 rounded-full border border-outline-variant mr-3 flex items-center justify-center ${severityValue === 'moderate' ? 'bg-error border-error' : ''}`}>
+                    <div className={`flex-shrink-0 w-4 h-4 rounded-full border border-outline-variant mr-3 flex items-center justify-center ${severityValue === 'moderate' ? 'bg-error border-error' : ''}`}>
                       <div className={`w-2 h-2 rounded-full bg-white ${severityValue === 'moderate' ? 'opacity-100' : 'opacity-0'}`}></div>
                     </div>
                     <div>
@@ -202,7 +197,7 @@ export default function InjuryCreate() {
                 <label className="cursor-pointer relative block">
                   <input {...register('severity')} className="peer sr-only severity-radio" type="radio" value="severe" />
                   <div className="severity-radio-label w-full border border-outline-variant rounded-lg p-4 flex items-center hover:bg-surface-container-low">
-                    <div className={`w-4 h-4 rounded-full border border-outline-variant mr-3 flex items-center justify-center ${severityValue === 'severe' ? 'bg-error border-error' : ''}`}>
+                    <div className={`flex-shrink-0 w-4 h-4 rounded-full border border-outline-variant mr-3 flex items-center justify-center ${severityValue === 'severe' ? 'bg-error border-error' : ''}`}>
                       <div className={`w-2 h-2 rounded-full bg-white ${severityValue === 'severe' ? 'opacity-100' : 'opacity-0'}`}></div>
                     </div>
                     <div>
@@ -233,14 +228,7 @@ export default function InjuryCreate() {
                   />
                   {errors.dateOccurred && <p className="font-label-md text-[11px] text-error mt-1">{errors.dateOccurred.message}</p>}
                 </div>
-                <div className="pt-4 border-t border-surface-variant">
-                  <p className="font-label-md text-label-md text-on-surface-variant mb-2">Linked Biometric Session (Optional)</p>
-                  <div className="flex items-center space-x-2 bg-surface p-2 rounded border border-outline-variant border-dashed">
-                    <span className="material-symbols-outlined text-on-surface-variant text-[18px]">link</span>
-                    <span className="font-mono-data text-mono-data text-on-surface-variant text-xs truncate">No session linked</span>
-                    <button className="ml-auto text-primary font-label-md text-label-md hover:underline" type="button">Link Data</button>
-                  </div>
-                </div>
+
               </div>
             </div>
 
@@ -260,10 +248,7 @@ export default function InjuryCreate() {
                 <span className="material-symbols-outlined">save</span>
                 <span>{isSubmitting ? 'Committing...' : 'Commit Clinical Record'}</span>
               </button>
-              <p className="text-center font-label-md text-label-md text-on-surface-variant mt-3 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[14px] mr-1">lock</span>
-                HIPAA Compliant Entry
-              </p>
+
             </div>
 
           </div>
