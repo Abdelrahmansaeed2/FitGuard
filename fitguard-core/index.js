@@ -79,6 +79,10 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/contact', contactRoutes);
 
+app.get('/', (req, res) => {
+  res.status(200).send('FitGuard API is running successfully!');
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
