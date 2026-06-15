@@ -8,7 +8,7 @@ export default function AppHeader() {
 
   return (
     <header className="h-[64px] sticky top-0 bg-surface border-b border-outline-variant flex justify-between items-center px-4 md:px-8 z-10">
-      {/* Mobile Menu Button (Placeholder for responsive behavior) */}
+      {/* Mobile Menu Button */ }
       <div className="md:hidden flex items-center">
         <button className="text-on-surface-variant p-2 mr-2 rounded-lg hover:bg-surface-container-high transition-colors">
           <span className="material-symbols-outlined">menu</span>

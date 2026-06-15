@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -117,7 +118,7 @@ export default function Settings() {
                   <span className="material-symbols-outlined text-primary">person</span>
                   Account Information
                 </h3>
-                <button className="font-label-md text-label-md text-primary hover:text-primary-fixed-dim transition-colors">Edit</button>
+                <Link to="/profile/edit" className="font-label-md text-label-md text-primary hover:text-primary-fixed-dim transition-colors">Edit</Link>
               </div>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -262,12 +263,6 @@ export default function Settings() {
                     <button onClick={() => handleConnectDevice('Garmin Connect')} className="font-label-md text-label-md px-3 py-1 bg-surface-container text-on-surface rounded hover:bg-surface-container-high transition-colors">Connect</button>
                   </div>
                 )}
-
-                <div className="pt-4 flex justify-center">
-                  <button className="font-label-md text-label-md text-primary hover:underline flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[16px]">add</span> View all supported devices
-                  </button>
-                </div>
               </div>
             </section>
 
@@ -341,9 +336,7 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Action Buttons Bottom */}
-        <div className="flex justify-end gap-4 pt-6 border-t border-outline-variant pb-12">
-          <button className="px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-high transition-colors">Discard Changes</button>
+        <div className="flex justify-end pt-6 border-t border-outline-variant pb-12">
           <button onClick={handleSaveConfig} disabled={saving} className="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm disabled:opacity-50">
             {saving ? 'Saving...' : 'Save Configuration'}
           </button>

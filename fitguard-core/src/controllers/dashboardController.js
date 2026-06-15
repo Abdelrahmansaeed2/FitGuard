@@ -45,15 +45,7 @@ exports.getStats = async (req, res, next) => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
 
-    const biometricsHistory = [
-      { day: 'Mon', hrv: 62, sleep: 7.5, score: 65 },
-      { day: 'Tue', hrv: 65, sleep: 8.0, score: 70 },
-      { day: 'Wed', hrv: 60, sleep: 6.8, score: 62 },
-      { day: 'Thu', hrv: 68, sleep: 8.2, score: 75 },
-      { day: 'Fri', hrv: 70, sleep: 7.9, score: 78 },
-      { day: 'Sat', hrv: 75, sleep: 8.5, score: 85 },
-      { day: 'Sun', hrv: 72, sleep: 8.1, score: 80 }
-    ];
+    const biometricsHistory = [];
 
     res.status(200).json({
       success: true,

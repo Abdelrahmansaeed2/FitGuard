@@ -116,7 +116,7 @@ export default function Register() {
                     <input 
                       className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-on-surface focus:outline-none focus:bg-surface focus:border-primary focus:ring-1 focus:ring-primary font-body-md placeholder-on-surface-variant transition-all" 
                       id="name" 
-                      placeholder="e.g. Alex Morgan" 
+                      placeholder="Your Name" 
                       type="text"
                       {...register('name')}
                     />
@@ -127,7 +127,7 @@ export default function Register() {
                     <input 
                       className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-on-surface focus:outline-none focus:bg-surface focus:border-primary focus:ring-1 focus:ring-primary font-body-md placeholder-on-surface-variant transition-all" 
                       id="email" 
-                      placeholder="alex@team.com" 
+                      placeholder="your@email.com" 
                       type="email"
                       {...register('email')}
                     />

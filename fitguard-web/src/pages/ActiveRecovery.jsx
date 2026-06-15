@@ -81,8 +81,8 @@ export default function ActiveRecovery() {
 
       {/* Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        {/* Left Column: Protocol Details & Tasks (8 columns) */}
-        <div className="lg:col-span-8 space-y-gutter">
+        {/* Main Protocol Details & Tasks (12 columns) */}
+        <div className="lg:col-span-12 space-y-gutter">
           {/* Timeline/Phases Card */}
           <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm">
             <h3 className="font-headline-sm text-headline-sm mb-6 flex items-center">
@@ -169,67 +169,6 @@ export default function ActiveRecovery() {
                 </label>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Right Column: Visuals & Stats (4 columns) */}
-        <div className="lg:col-span-4 space-y-gutter">
-          {/* Imagery Card */}
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
-            <div className="h-48 bg-surface-variant relative w-full" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8OWwSoZn52hzq05029UzzScwM4HT8UAFtoBW9dUOOD1UPmqPU3DhIu4YfjwLOyqV9PCJlj37LY8neSXPVadj4DbotStRYzJ12eifvj9ai0WfllOB-Td64KQJ5QGXe37bmXp3NguHEo3JUrVkSz_qCnppo3-PQTZO7yUf3GYlEaKK_b3LcV85Xjr9vfZ2jzWgQ-fSIaw9wp4QinybRTakVORiHK2YnsliOhnn8hhNVmOc3BX4izCnDRBxcxK8U3X3BZRktet7l1Ww')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                <p className="text-on-tertiary font-label-md text-label-md">Reference: ISO Hold Form</p>
-              </div>
-            </div>
-            <div className="p-4 bg-surface-container-lowest">
-              <h4 className="font-label-md text-label-md text-on-surface mb-2">Physio Notes</h4>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">Ensure heel remains grounded during holds. Do not push past a 3/10 pain threshold. Focus on slow breathing to manage sympathetic tone.</p>
-            </div>
-          </div>
-
-          {/* Key Metrics Bento */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col justify-center items-center text-center shadow-sm">
-              <span className="material-symbols-outlined text-primary mb-2">vital_signs</span>
-              <span className="font-display-md text-display-md text-on-surface">62<span className="text-sm">ms</span></span>
-              <span className="font-label-md text-label-md text-on-surface-variant">Avg HRV</span>
-            </div>
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col justify-center items-center text-center shadow-sm">
-              <span className="material-symbols-outlined text-secondary mb-2">bedtime</span>
-              <span className="font-display-md text-display-md text-on-surface">8.2<span className="text-sm">h</span></span>
-              <span className="font-label-md text-label-md text-on-surface-variant">Sleep Score</span>
-            </div>
-            
-            <div className="col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-label-md text-label-md text-on-surface-variant">Pain Trend (7 Day)</span>
-                <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface text-xs font-mono-data">Improving</span>
-              </div>
-              {/* Placeholder for a mini chart/sparkline using a subtle background gradient to simulate data */}
-              <div className="h-12 w-full bg-surface-variant rounded overflow-hidden flex items-end">
-                <div className="w-[14.28%] h-full bg-outline-variant bg-opacity-20 mx-px"></div>
-                <div className="w-[14.28%] h-4/5 bg-outline-variant bg-opacity-30 mx-px"></div>
-                <div className="w-[14.28%] h-3/5 bg-outline-variant bg-opacity-40 mx-px"></div>
-                <div className="w-[14.28%] h-3/5 bg-outline-variant bg-opacity-50 mx-px"></div>
-                <div className="w-[14.28%] h-2/5 bg-outline-variant bg-opacity-60 mx-px"></div>
-                <div className="w-[14.28%] h-1/5 bg-primary bg-opacity-70 mx-px"></div>
-                <div className="w-[14.28%] h-1/5 bg-primary mx-px"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* AI Insight */}
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-3 opacity-10">
-              <span className="material-symbols-outlined text-6xl text-secondary">auto_awesome</span>
-            </div>
-            <h4 className="font-label-md text-label-md text-secondary flex items-center mb-2">
-              <span className="material-symbols-outlined text-sm mr-1">auto_awesome</span>
-              FitGuard AI Insight
-            </h4>
-            <p className="font-body-sm text-body-sm text-on-surface-variant relative z-10">
-              Based on your elevated HRV over the last 48 hours, your systemic recovery is optimal. You are cleared to increase isometric load duration by 15% today if pain remains below 3/10.
-            </p>
           </div>
         </div>
       </div>

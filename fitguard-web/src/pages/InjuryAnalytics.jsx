@@ -72,26 +72,10 @@ export default function InjuryAnalytics() {
       </div>
 
       {/* Analytics Grid */}
-      <div className="grid grid-cols-12 gap-6">
-        
-        {/* Heat Map (Recurring Injury Pattern) */}
-        <div className="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-headline-sm text-headline-sm text-on-background">Recurring Injury Pattern</h3>
-            <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">more_horiz</span>
-          </div>
-          <div className="flex-grow w-full rounded-lg bg-surface-container flex items-center justify-center min-h-[340px] relative overflow-hidden border border-outline-variant">
-            {/* Abstract Placeholder for Heatmap */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-error-container/40 via-surface-container to-surface-container"></div>
-            <div className="relative z-10 flex flex-col items-center gap-2">
-              <span className="material-symbols-outlined text-[48px] text-error opacity-80">body_system</span>
-              <span className="font-mono-data text-mono-data text-on-surface-variant bg-surface px-3 py-1 rounded border border-outline-variant shadow-sm">Map Data Loading...</span>
-            </div>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Severity Breakdown (Pie/Donut Concept) */}
-        <div className="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm">
           <h3 className="font-headline-sm text-headline-sm text-on-background mb-6">Severity Breakdown</h3>
           <div className="flex-grow flex flex-col items-center justify-center min-h-[200px] mb-6">
             <div className="relative w-48 h-48 rounded-full border-[16px] border-surface-container-high flex items-center justify-center">
@@ -124,7 +108,7 @@ export default function InjuryAnalytics() {
         </div>
 
         {/* Most Affected Muscle Groups (Bar Chart) */}
-        <div className="col-span-12 lg:col-span-6 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm">
           <h3 className="font-headline-sm text-headline-sm text-on-background mb-6">Most Affected Muscle Groups</h3>
           <div className="flex-grow flex flex-col gap-5 justify-center min-h-[220px]">
             {!stats || stats.sortedMuscles.length === 0 ? (
@@ -146,44 +130,6 @@ export default function InjuryAnalytics() {
                 );
               })
             )}
-          </div>
-        </div>
-
-        {/* Injury Frequency (Line Chart) */}
-        <div className="col-span-12 lg:col-span-6 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-headline-sm text-headline-sm text-on-background">Injury Frequency (12m)</h3>
-            <div className="bg-surface-container border border-outline-variant rounded px-2 py-1 flex items-center gap-1 cursor-pointer">
-              <span className="font-label-md text-label-md text-on-surface">Monthly</span>
-              <span className="material-symbols-outlined text-[16px]">expand_more</span>
-            </div>
-          </div>
-          {/* Chart Area */}
-          <div className="flex-grow w-full relative min-h-[220px] flex items-end">
-            {/* Y-Axis Grid */}
-            <div className="absolute inset-0 flex flex-col justify-between pb-6">
-              <div className="w-full border-t border-outline-variant border-dashed"></div>
-              <div className="w-full border-t border-outline-variant border-dashed"></div>
-              <div className="w-full border-t border-outline-variant border-dashed"></div>
-              <div className="w-full border-t border-outline"></div>
-            </div>
-            {/* Simple SVG Line Chart representation */}
-            <div className="absolute inset-0 pb-6 pt-2">
-              <svg className="w-full h-full text-primary" preserveAspectRatio="none" viewBox="0 0 100 50">
-                {/* Line */}
-                <path d="M0,45 C15,40 25,10 40,25 C55,40 70,30 100,35" fill="none" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke"></path>
-                {/* Gradient Fill */}
-                <path d="M0,45 C15,40 25,10 40,25 C55,40 70,30 100,35 L100,50 L0,50 Z" fill="currentColor" fillOpacity="0.1"></path>
-              </svg>
-            </div>
-            {/* X-Axis Labels */}
-            <div className="absolute bottom-0 left-0 w-full flex justify-between px-2 text-label-md font-label-md text-on-surface-variant">
-              <span>Jan</span>
-              <span>Apr</span>
-              <span>Jul</span>
-              <span>Oct</span>
-              <span>Dec</span>
-            </div>
           </div>
         </div>
 

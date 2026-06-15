@@ -84,7 +84,7 @@ export default function Login() {
                 <input 
                   className={`w-full pl-10 pr-4 py-3 bg-surface-container-lowest border ${errors.email ? 'border-error' : 'border-outline-variant'} rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-body-md text-body-md text-on-surface placeholder-outline transition-colors`} 
                   id="email" 
-                  placeholder="athlete@example.com" 
+                  placeholder="your@email.com" 
                   type="email"
                   {...register('email')}
                 />
