@@ -216,8 +216,8 @@ export default function ActiveChallenge() {
                     className="w-full bg-primary hover:bg-surface-tint text-on-primary font-headline-sm text-headline-sm py-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
                     disabled={!allExercisesCompleted && totalExercises > 0}
                   >
-                    <span className="material-symbols-outlined">check_circle</span>
-                    <span>Complete Day</span>
+                    <span className="material-symbols-outlined">{totalExercises === 0 ? 'skip_next' : 'check_circle'}</span>
+                    <span>{totalExercises === 0 ? 'Skip Rest Day' : 'Complete Day'}</span>
                   </button>
                 </div>
               </div>
