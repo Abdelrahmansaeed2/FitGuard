@@ -60,7 +60,7 @@ apiClient.interceptors.response.use(
         }
         return obj;
       };
-      
+
       const transformedData = transformIds(response.data.data);
       if (response.data.data.accessToken) {
         transformedData.access_token = response.data.data.accessToken;
@@ -80,7 +80,7 @@ apiClient.interceptors.response.use(
       }
 
       if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         }).then(token => {
           originalRequest.headers.Authorization = `Bearer ${token}`;
@@ -102,7 +102,7 @@ apiClient.interceptors.response.use(
 
         const newAccessToken = response.data.data ? response.data.data.accessToken : response.data.access_token;
         const newRefreshToken = response.data.data ? response.data.data.refreshToken : response.data.refreshToken;
-        
+
         if (newAccessToken) localStorage.setItem('access_token', newAccessToken);
         if (newRefreshToken) localStorage.setItem('refresh_token', newRefreshToken);
 
@@ -126,7 +126,7 @@ apiClient.interceptors.response.use(
     // Global Error Handling
     const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
     console.error('API Error:', errorMessage);
-    
+
     return Promise.reject(error);
   }
 );

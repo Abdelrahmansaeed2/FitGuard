@@ -80,7 +80,7 @@ export default function Dashboard() {
               </div>
               <div className="flex justify-between items-center py-2 border-b border-surface-variant">
                 <span className="font-body-sm text-body-sm text-on-surface-variant">Systemic Load</span>
-                <span className="font-mono-data text-mono-data text-on-surface">Moderate</span>
+                <span className="font-mono-data text-mono-data text-on-surface">Tracking</span>
               </div>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function Dashboard() {
               <div className="space-y-3 flex-1">
                 <div className="flex justify-between items-center">
                   <span className="font-body-sm text-body-sm text-on-surface">Duration</span>
-                  <span className="font-mono-data text-mono-data text-secondary">30 Days</span>
+                  <span className="font-mono-data text-mono-data text-secondary">{activeChallenge.generatedPlan?.length || 30} Days</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-body-sm text-body-sm text-on-surface">Status</span>
