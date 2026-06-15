@@ -17,7 +17,8 @@ const connectDB = async () => {
     }
 
     try {
-      const conn = await mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 2000 });
+      const options = process.env.NODE_ENV === 'production' ? {} : { serverSelectionTimeoutMS: 2000 };
+      const conn = await mongoose.connect(mongoURI, options);
       console.log(`[Database Connection]: Connected to MongoDB at host ${conn.connection.host}`);
     } catch (err) {
       console.log(`[Database Connection Warning]: Standard connection failed (${err.message}).`);
