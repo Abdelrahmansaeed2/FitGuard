@@ -23,7 +23,9 @@ async function run() {
 
   // 1. MIGRATION VALIDATION
   console.log("\\n--- MIGRATION VALIDATION ---");
-  const c1 = new Challenge({
+  const c1Id = new mongoose.Types.ObjectId();
+  await mongoose.connection.db.collection('challenges').insertOne({
+    _id: c1Id,
     userId: user._id,
     sport: 'Soccer',
     difficulty: 'intermediate',
@@ -32,7 +34,6 @@ async function run() {
       { day: 1, completed: false, exercises: ["Run 5km", "100 pushups"] }
     ]
   });
-  await c1.save();
   
   const c2 = new Challenge({
     userId: user._id,
@@ -45,51 +46,65 @@ async function run() {
   });
   await c2.save();
 
-  const r1 = new RecoveryProtocol({
+  const r1Id = new mongoose.Types.ObjectId();
+  await mongoose.connection.db.collection('recoveryprotocols').insertOne({
+    _id: r1Id,
     userId: user._id,
     injuryLogId: new mongoose.Types.ObjectId(),
+    status: 'active',
     phases: [
       { phaseNumber: 1, name: 'Rest', durationDays: 7, completed: false, exercises: ["Rest day", "Ice"] }
     ]
   });
-  await r1.save();
 
   let cStrFound = 0, cMigrated = 0;
-  const challenges = await Challenge.find({});
-  for (let ch of challenges) {
+  const dbChallenges = await mongoose.connection.db.collection('challenges').find({}).toArray();
+  for (let ch of dbChallenges) {
     let needsMigration = false;
-    ch.generatedPlan.forEach(day => {
-      day.exercises.forEach((ex, i) => {
-        if (typeof ex === 'string') {
-          needsMigration = true;
-          day.exercises[i] = { title: ex, completed: false };
+    if (ch.generatedPlan) {
+      ch.generatedPlan.forEach(day => {
+        if (day.exercises) {
+          day.exercises.forEach((ex, i) => {
+            if (typeof ex === 'string') {
+              needsMigration = true;
+              day.exercises[i] = { title: ex, completed: false };
+            }
+          });
         }
       });
-    });
+    }
     if (needsMigration) {
       cStrFound++;
-      ch.markModified('generatedPlan');
-      await ch.save();
+      await mongoose.connection.db.collection('challenges').updateOne(
+        { _id: ch._id },
+        { $set: { generatedPlan: ch.generatedPlan } }
+      );
       cMigrated++;
     }
   }
 
   let rStrFound = 0, rMigrated = 0;
-  const recoveries = await RecoveryProtocol.find({});
-  for (let r of recoveries) {
+  const dbRecoveries = await mongoose.connection.db.collection('recoveryprotocols').find({}).toArray();
+  for (let r of dbRecoveries) {
     let needsMigration = false;
-    r.phases.forEach(ph => {
-      ph.exercises.forEach((ex, i) => {
-        if (typeof ex === 'string') {
-          needsMigration = true;
-          ph.exercises[i] = { title: ex, completed: false };
+    if (r.phases) {
+      r.phases.forEach(ph => {
+        if (ph.exercises) {
+          ph.exercises.forEach((ex, i) => {
+            if (typeof ex === 'string') {
+              needsMigration = true;
+              ph.exercises[i] = { title: ex, completed: false };
+            }
+          });
         }
       });
-    });
+    }
     if (needsMigration) {
       rStrFound++;
-      r.markModified('phases');
-      await r.save();
+      await mongoose.connection.db.collection('recoveryprotocols').updateOne(
+        { _id: r._id },
+        { $set: { phases: r.phases } }
+      );
       rMigrated++;
     }
   }
@@ -98,8 +113,8 @@ async function run() {
   console.log(`Recovery Migration: Found ${rStrFound} legacy strings. Migrated ${rMigrated}. Failed 0.`);
 
   // 2. EXERCISE COMPLETION & PHASE CANCEL
-  console.log("\\n--- CHALLENGE LIFECYCLE ---");
-  const activeC = await Challenge.findById(c1._id);
+  console.log("\n--- CHALLENGE LIFECYCLE ---");
+  const activeC = await Challenge.findById(c1Id);
   const day = activeC.generatedPlan[0];
   const ex1 = day.exercises[0];
   
@@ -119,8 +134,8 @@ async function run() {
   console.log(`Challenge completedAt exists: ${!!activeC.completedAt}`);
 
   // 4. RECOVERY LIFECYCLE
-  console.log("\\n--- RECOVERY LIFECYCLE ---");
-  const activeR = await RecoveryProtocol.findById(r1._id);
+  console.log("\n--- RECOVERY LIFECYCLE ---");
+  const activeR = await RecoveryProtocol.findById(r1Id);
   const phase1 = activeR.phases[0];
   console.log(`Initial Phase 1 Completed: ${phase1.completed}`);
   phase1.exercises[0].completed = true;

@@ -118,7 +118,7 @@ export default function ChallengeDetails() {
         </div>
 
         <div className="space-y-8">
-          {[0, 1, 2, 3].map(weekIndex => {
+          {[0, 1, 2, 3, 4].map(weekIndex => {
             const weekDays = challenge.generatedPlan.slice(weekIndex * 7, (weekIndex + 1) * 7);
             if (weekDays.length === 0) return null;
             return (
