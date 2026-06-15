@@ -19,26 +19,9 @@ export default function Settings() {
   const { user, updatePassword } = useAuthStore();
   const { profile, fetchProfile, updateSettings } = useProfileStore();
   
-  const [toggles, setToggles] = useState({
-    alerts: true,
-    summary: true,
-    updates: false
-  });
-
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
-
-  useEffect(() => {
-    if (profile?.settings) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setToggles({
-        alerts: profile.settings.alerts ?? true,
-        summary: profile.settings.summary ?? true,
-        updates: profile.settings.updates ?? false
-      });
-    }
-  }, [profile?.settings]);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(passwordSchema)
@@ -54,33 +37,6 @@ export default function Settings() {
     }
   };
 
-  const handleToggle = async (key) => {
-    const newToggles = { ...toggles, [key]: !toggles[key] };
-    setToggles(newToggles);
-    try {
-      await updateSettings(newToggles);
-    } catch (err) { // eslint-disable-line no-unused-vars
-      // Revert if error
-      setToggles(toggles);
-    }
-  };
-
-  const [saving, setSaving] = useState(false);
-
-  const handleSaveConfig = async () => {
-    setSaving(true);
-    try {
-      await updateSettings(toggles);
-      alert('Configuration saved successfully');
-    } catch (err) { // eslint-disable-line no-unused-vars
-      alert('Failed to save configuration');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-
-
   if (!profile || !user) {
     return <div className="p-8 text-center">Loading settings...</div>;
   }
@@ -92,14 +48,14 @@ export default function Settings() {
         {/* Page Header */}
         <div>
           <h1 className="font-headline-lg text-headline-lg text-on-surface">Global Configuration</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant mt-2">Manage your biometric data sources, security preferences, and system notifications.</p>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-2">Manage your security preferences and account settings.</p>
         </div>
 
         {/* Bento Grid Layout for Settings */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Left Column: Account & Security (Spans 7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* Left Column: Account & Security (Spans 12 cols, max width) */}
+          <div className="lg:col-span-12 max-w-3xl space-y-6">
             
             {/* Account Information Card */}
             <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
@@ -124,13 +80,6 @@ export default function Settings() {
                 <div>
                   <label className="block font-label-md text-label-md text-on-surface-variant mb-1">Email Address</label>
                   <input className="w-full px-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md text-body-md text-on-surface opacity-70" disabled type="email" value={profile.email} />
-                </div>
-                <div className="pt-4 border-t border-surface-variant flex justify-between items-center">
-                  <div>
-                    <p className="font-body-sm text-body-sm text-on-surface">Data Region</p>
-                    <p className="font-label-md text-label-md text-on-surface-variant">US-East (Clinical Compliance)</p>
-                  </div>
-                  <span className="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-md text-label-md">HIPAA Compliant</span>
                 </div>
               </div>
             </section>
@@ -183,88 +132,7 @@ export default function Settings() {
               </form>
             </section>
           </div>
-
-          {/* Right Column: Integrations & Notifications (Spans 5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            
-
-
-            {/* Notification Preferences */}
-            <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
-              <h3 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary">notifications_active</span>
-                Notifications
-              </h3>
-              
-              <div className="space-y-5">
-                {/* Recovery Alerts */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-headline-sm text-headline-sm text-on-surface text-base">Critical Recovery Alerts</p>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant text-xs mt-1">Push notifications when biometric risk markers elevate.</p>
-                  </div>
-                  <div className="relative inline-block w-11 h-6 select-none mt-1">
-                    <input 
-                      type="checkbox" 
-                      id="toggle1" 
-                      className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10" 
-                      checked={toggles.alerts}
-                      onChange={() => handleToggle('alerts')}
-                    />
-                    <label htmlFor="toggle1" className="toggle-label block overflow-hidden h-6 rounded-full bg-surface-dim cursor-pointer"></label>
-                  </div>
-                </div>
-
-                <hr className="border-surface-variant" />
-
-                {/* Daily Summary */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-headline-sm text-headline-sm text-on-surface text-base">Daily Readiness Summary</p>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant text-xs mt-1">Morning email detailing sleep and readiness scores.</p>
-                  </div>
-                  <div className="relative inline-block w-11 h-6 select-none mt-1">
-                    <input 
-                      type="checkbox" 
-                      id="toggle2" 
-                      className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10" 
-                      checked={toggles.summary}
-                      onChange={() => handleToggle('summary')}
-                    />
-                    <label htmlFor="toggle2" className="toggle-label block overflow-hidden h-6 rounded-full bg-surface-dim cursor-pointer"></label>
-                  </div>
-                </div>
-
-                <hr className="border-surface-variant" />
-
-                {/* System Updates */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-headline-sm text-headline-sm text-on-surface text-base">Algorithm Updates</p>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant text-xs mt-1">Email notifications when AI recovery models are refined.</p>
-                  </div>
-                  <div className="relative inline-block w-11 h-6 select-none mt-1">
-                    <input 
-                      type="checkbox" 
-                      id="toggle3" 
-                      className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10" 
-                      checked={toggles.updates}
-                      onChange={() => handleToggle('updates')}
-                    />
-                    <label htmlFor="toggle3" className="toggle-label block overflow-hidden h-6 rounded-full bg-surface-dim cursor-pointer"></label>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
         </div>
-
-        <div className="flex justify-end pt-6 border-t border-outline-variant pb-12">
-          <button onClick={handleSaveConfig} disabled={saving} className="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm disabled:opacity-50">
-            {saving ? 'Saving...' : 'Save Configuration'}
-          </button>
-        </div>
-
       </div>
     </div>
   );
