@@ -35,9 +35,10 @@ export default function Home() {
           
           <div className="lg:col-span-6 relative mt-16 lg:mt-0">
             {/* High-performance imagery */}
-            <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-surface-container to-surface-variant relative">
-              {/* Dynamic Geometric Placeholder to replace fake imagery */}
-              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary via-surface-container to-surface-container"></div>
+            <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-surface-container relative shadow-2xl">
+              <img src="/hero-bg.png" alt="Athlete training with biometric tracking" className="absolute inset-0 w-full h-full object-cover" />
+              {/* Subtle color overlay */}
+              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary via-transparent to-surface-container mix-blend-overlay"></div>
               {/* Floating Data Card */}
               <div className="absolute bottom-6 left-6 bg-surface-container-lowest border border-outline-variant p-4 rounded-xl shadow-lg w-64 backdrop-blur-md bg-opacity-90">
                 <div className="flex justify-between items-center mb-2">

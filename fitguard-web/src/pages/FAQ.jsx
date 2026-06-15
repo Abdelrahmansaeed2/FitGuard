@@ -25,6 +25,13 @@ function AccordionItem({ title, content, isPrimary = false }) {
 }
 
 export default function FAQ() {
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16">
       {/* Header */}
@@ -37,10 +44,10 @@ export default function FAQ() {
         {/* Sidebar Navigation */}
         <div className="col-span-1 md:col-span-3 lg:col-span-3">
           <div className="sticky top-[100px] space-y-2">
-            <button className="w-full text-left px-4 py-3 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md font-bold border-l-4 border-primary transition-all">General Questions</button>
-            <button className="w-full text-left px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-lowest font-label-md text-label-md font-medium border-l-4 border-transparent hover:border-outline-variant transition-all">Injury Tracking</button>
-            <button className="w-full text-left px-4 py-3 rounded-lg text-secondary hover:bg-secondary-fixed/20 font-label-md text-label-md font-bold border-l-4 border-transparent hover:border-secondary transition-all">AI Recovery Protocols</button>
-            <button className="w-full text-left px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-lowest font-label-md text-label-md font-medium border-l-4 border-transparent hover:border-outline-variant transition-all">Subscription & Pricing</button>
+            <button onClick={() => scrollToSection('general')} className="w-full text-left px-4 py-3 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md font-bold border-l-4 border-primary transition-all">General Questions</button>
+            <button onClick={() => scrollToSection('injury')} className="w-full text-left px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-lowest font-label-md text-label-md font-medium border-l-4 border-transparent hover:border-outline-variant transition-all">Injury Tracking</button>
+            <button onClick={() => scrollToSection('ai-recovery')} className="w-full text-left px-4 py-3 rounded-lg text-secondary hover:bg-secondary-fixed/20 font-label-md text-label-md font-bold border-l-4 border-transparent hover:border-secondary transition-all">AI Recovery Protocols</button>
+            <button onClick={() => scrollToSection('pricing')} className="w-full text-left px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-lowest font-label-md text-label-md font-medium border-l-4 border-transparent hover:border-outline-variant transition-all">Subscription & Pricing</button>
           </div>
         </div>
 
@@ -48,7 +55,7 @@ export default function FAQ() {
         <div className="col-span-1 md:col-span-9 lg:col-span-8 lg:col-start-5 space-y-12">
           
           {/* Section: General */}
-          <section>
+          <section id="general">
             <h2 className="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-4 mb-6">General Questions</h2>
             <div className="space-y-4">
               <AccordionItem 
@@ -62,8 +69,19 @@ export default function FAQ() {
             </div>
           </section>
 
+          {/* Section: Injury Tracking */}
+          <section id="injury">
+            <h2 className="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-4 mb-6">Injury Tracking</h2>
+            <div className="space-y-4">
+              <AccordionItem 
+                title="How do I log an injury?"
+                content="You can log an injury through your dashboard by selecting the affected area, severity, and current status. Our platform then tracks your recovery progress and adjusts your protocols."
+              />
+            </div>
+          </section>
+
           {/* Section: AI Recovery */}
-          <section>
+          <section id="ai-recovery">
             <div className="flex items-center space-x-3 border-b border-secondary/30 pb-4 mb-6">
               <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
               <h2 className="font-headline-md text-headline-md text-secondary">AI Recovery Protocols</h2>
@@ -83,7 +101,7 @@ export default function FAQ() {
           </section>
 
           {/* Section: Pricing */}
-          <section>
+          <section id="pricing">
             <h2 className="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-4 mb-6">Subscription & Pricing</h2>
             <div className="space-y-4">
               <AccordionItem 

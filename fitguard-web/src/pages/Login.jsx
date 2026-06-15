@@ -100,9 +100,6 @@ export default function Login() {
                 <label className="font-label-md text-label-md text-on-surface-variant block uppercase" htmlFor="password">
                   Password
                 </label>
-                <Link to="#" className="font-label-md text-label-md text-primary hover:text-primary-container transition-colors">
-                  Forgot password?
-                </Link>
               </div>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" style={{ fontVariationSettings: "'FILL' 0" }}>
@@ -151,23 +148,7 @@ export default function Login() {
             </div>
           </form>
 
-          {/* Developer Note Section */}
-          <div className="mt-12 p-4 bg-surface-container rounded-lg border border-outline-variant/50">
-            <div className="flex items-center gap-2 mb-2 text-on-surface-variant">
-              <span className="material-symbols-outlined text-[16px]">code</span>
-              <h3 className="font-label-md text-label-md uppercase tracking-wider">Developer Note</h3>
-            </div>
-            <div className="font-mono-data text-mono-data text-on-surface-variant space-y-1">
-              <p className="flex items-center gap-2">
-                <span className="bg-primary text-white px-1.5 py-0.5 rounded text-[10px] font-bold">POST</span> 
-                /api/auth/login
-              </p>
-              <p className="text-outline text-[12px] mt-2">Payload expected:</p>
-              <pre className="text-[11px] bg-surface-container-high p-2 rounded mt-1 overflow-x-auto text-on-surface">
-                {`{\n  "email": "string",\n  "password": "string"\n}`}
-              </pre>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

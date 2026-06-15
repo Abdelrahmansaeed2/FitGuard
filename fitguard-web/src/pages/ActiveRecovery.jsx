@@ -116,7 +116,7 @@ export default function ActiveRecovery() {
                             <h4 className="font-label-md text-label-md text-primary">Phase {phase.phaseNumber}: {phase.name} (Current)</h4>
                             <span className="px-2 py-0.5 rounded text-xs font-mono-data bg-surface-lowest text-on-surface-variant border border-outline-variant">{phase.durationDays} Days</span>
                           </div>
-                          <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">{phase.exercises.map(e => e.name || e).join(', ')}</p>
+                          <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">{phase.exercises.map(e => e.title || e.name || (typeof e === 'string' ? e : 'Unnamed Exercise')).join(', ')}</p>
                           {/* Progress Bar */}
                           <div className="w-full bg-surface-variant rounded-full h-2.5 mb-1">
                             <div className="bg-primary h-2.5 rounded-full" style={{ width: '45%' }}></div>

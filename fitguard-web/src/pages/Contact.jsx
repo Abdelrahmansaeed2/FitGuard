@@ -167,16 +167,7 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="h-px w-full bg-outline-variant my-6"></div>
 
-            <div>
-              <p className="font-label-md text-label-md text-on-surface-variant mb-3">Quick Resources</p>
-              <ul className="space-y-2">
-                <li><Link to="/faq" className="font-body-sm text-body-sm text-on-surface hover:text-primary flex items-center space-x-2"><span className="material-symbols-outlined text-[16px]">open_in_new</span> <span>FAQ & Support</span></Link></li>
-                <li><Link to="/terms" className="font-body-sm text-body-sm text-on-surface hover:text-primary flex items-center space-x-2"><span className="material-symbols-outlined text-[16px]">open_in_new</span> <span>Terms of Service</span></Link></li>
-                <li><Link to="/privacy" className="font-body-sm text-body-sm text-on-surface hover:text-primary flex items-center space-x-2"><span className="material-symbols-outlined text-[16px]">open_in_new</span> <span>Privacy Policy</span></Link></li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
