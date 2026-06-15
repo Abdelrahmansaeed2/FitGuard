@@ -28,8 +28,9 @@ const corsOptions = {
 
     const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
     const isFrontendUrl = origin === process.env.FRONTEND_URL;
+    const isVercel = /\.vercel\.app$/.test(origin);
 
-    if (isLocalhost || isFrontendUrl) {
+    if (isLocalhost || isFrontendUrl || isVercel) {
       callback(null, true);
     } else {
       callback(new Error('Blocked by CORS policy'));
