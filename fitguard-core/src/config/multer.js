@@ -12,7 +12,7 @@ if (process.env.CLOUDINARY_URL) {
   console.warn('[Warning]: CLOUDINARY_URL is missing. Uploads will be saved locally and may be lost on ephemeral environments like Vercel/Render.');
 }
 
-const uploadDir = path.join(__dirname, '../../uploads');
+const uploadDir = process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, '../../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
