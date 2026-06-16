@@ -8,7 +8,12 @@ exports.uploadFile = async (req, res, next) => {
       });
     }
 
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    // If Cloudinary is used, req.file.path contains the full URL.
+    // Otherwise, construct the local URL.
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const fileUrl = (req.file.path && req.file.path.startsWith('http'))
+      ? req.file.path
+      : `${protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
     res.status(201).json({
       success: true,
