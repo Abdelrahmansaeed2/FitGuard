@@ -41,16 +41,16 @@ export default function ActiveChallenge() {
       {view === 'dashboard' ? (
         <div className="max-w-container-max mx-auto space-y-8">
           {/* Header Section */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-            <div>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+            <div className="w-full md:w-auto">
               <p className="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">AI Program Active</p>
-              <h2 className="font-display-md text-display-md text-on-surface">30-Day Resilience Challenge</h2>
+              <h2 className="font-display-sm md:font-display-md text-display-sm md:text-display-md text-on-surface break-words">30-Day Resilience Challenge</h2>
             </div>
-            <div className="flex flex-wrap gap-4 w-full md:w-auto">
-              <button onClick={() => setShowAbandonModal(true)} className="flex-1 md:flex-none px-6 py-2 border border-error text-error font-label-md text-label-md rounded-full hover:bg-error-container transition-colors text-center">
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <button onClick={() => setShowAbandonModal(true)} className="w-full sm:w-auto px-6 py-3 md:py-2 border border-error text-error font-label-md text-label-md rounded-full hover:bg-error-container transition-colors text-center">
                 Abandon
               </button>
-              <Link to={`/challenges/${activeChallenge.id || activeChallenge._id}`} className="flex-1 md:flex-none px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-full hover:bg-surface-container-low transition-colors text-center">
+              <Link to={`/challenges/${activeChallenge.id || activeChallenge._id}`} className="w-full sm:w-auto px-6 py-3 md:py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-full hover:bg-surface-container-low transition-colors text-center">
                 View Guidelines
               </Link>
             </div>
@@ -81,21 +81,21 @@ export default function ActiveChallenge() {
                   <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2">Phase {Math.ceil(currentDay / 10)}: {Math.ceil(currentDay / 10) === 1 ? 'Foundation' : Math.ceil(currentDay / 10) === 2 ? 'Adaptation' : 'Mastery'}</h3>
                   <p className="font-body-md text-body-md text-on-surface-variant">You are maintaining a strong recovery baseline. Biometric strain is optimal for current workload.</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 w-full">
-                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex flex-col min-[400px]:flex-row items-center min-[400px]:items-start gap-3 text-center min-[400px]:text-left">
-                    <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex-shrink-0 flex items-center justify-center text-tertiary overflow-hidden">
-                      <span className="material-symbols-outlined text-[20px] sm:text-[24px] leading-none whitespace-nowrap">local_fire_department</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-tertiary-container/20 flex-shrink-0 flex items-center justify-center text-tertiary">
+                      <span className="material-symbols-outlined text-[24px] select-none" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
                     </div>
-                    <div className="flex-1 overflow-hidden w-full">
+                    <div className="flex-1 min-w-0">
                       <p className="font-label-md text-label-md text-on-surface-variant truncate">Current Streak</p>
                       <p className="font-headline-md text-headline-md text-on-surface truncate">{completedDaysCount} Days</p>
                     </div>
                   </div>
-                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex flex-col min-[400px]:flex-row items-center min-[400px]:items-start gap-3 text-center min-[400px]:text-left">
-                    <div className="w-10 h-10 rounded-full bg-primary-container/20 flex-shrink-0 flex items-center justify-center text-primary overflow-hidden">
-                      <span className="material-symbols-outlined text-[20px] sm:text-[24px] leading-none whitespace-nowrap">task_alt</span>
+                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary-container/20 flex-shrink-0 flex items-center justify-center text-primary">
+                      <span className="material-symbols-outlined text-[24px] select-none" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>task_alt</span>
                     </div>
-                    <div className="flex-1 overflow-hidden w-full">
+                    <div className="flex-1 min-w-0">
                       <p className="font-label-md text-label-md text-on-surface-variant truncate">Completion Rate</p>
                       <p className="font-headline-md text-headline-md text-on-surface truncate">{progressPercentage}%</p>
                     </div>
@@ -136,7 +136,7 @@ export default function ActiveChallenge() {
                 </div>
               </div>
               {/* Grid */}
-              <div className="grid grid-cols-5 md:grid-cols-10 gap-2 sm:gap-3">
+              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-10 gap-2 sm:gap-3">
                 {activeChallenge.generatedPlan.map((dayObj, index) => {
                   const isCompleted = dayObj.completed;
                   const isToday = !isCompleted && currentDay === dayObj.day;
@@ -145,9 +145,9 @@ export default function ActiveChallenge() {
                   else if (isToday) bgClass = "bg-secondary-container text-on-secondary-container shadow-md scale-105 transform border border-secondary";
                   
                   return (
-                    <div key={index} className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all ${bgClass}`}>
-                      <span className="font-label-md text-label-md mb-1">Day</span>
-                      <span className="font-headline-md text-headline-md">{dayObj.day}</span>
+                    <div key={index} className={`flex flex-col items-center justify-center py-2 px-1 sm:p-3 rounded-lg transition-all ${bgClass} min-w-0`}>
+                      <span className="font-label-sm sm:font-label-md text-label-sm sm:text-label-md mb-1">Day</span>
+                      <span className="font-title-lg sm:font-headline-md text-title-lg sm:text-headline-md">{dayObj.day}</span>
                     </div>
                   );
                 })}
@@ -192,7 +192,7 @@ export default function ActiveChallenge() {
                       key={ex.id || ex._id || idx}
                       className={`flex items-center p-4 border rounded-lg transition-all ${ex.completed ? 'bg-surface-container-low border-outline-variant' : 'bg-surface-container-lowest border-outline-variant hover:border-outline group'}`}
                     >
-                      <div className="relative flex items-center justify-center mr-4">
+                      <div className="relative flex items-center justify-center mr-4 flex-shrink-0">
                         <input 
                           type="checkbox" 
                           checked={ex.completed}
@@ -200,13 +200,13 @@ export default function ActiveChallenge() {
                           className="w-6 h-6 border-outline text-primary rounded-sm focus:ring-primary focus:ring-opacity-50 cursor-pointer" 
                         />
                       </div>
-                      <div className="flex-1">
-                        <h4 className={`font-headline-sm text-headline-sm text-on-surface ${ex.completed ? 'line-through text-opacity-60' : ''}`}>{ex.title}</h4>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                      <div className="flex-1 min-w-0 pr-4">
+                        <h4 className={`font-headline-sm text-headline-sm text-on-surface break-words ${ex.completed ? 'line-through text-opacity-60' : ''}`}>{ex.title}</h4>
+                        <p className="font-body-sm text-body-sm text-on-surface-variant break-words mt-1">
                           {ex.sets && ex.reps ? `${ex.sets} sets x ${ex.reps} reps` : ex.description || 'Focus on form'}
                         </p>
                       </div>
-                      <span className={`material-symbols-outlined ${ex.completed ? 'text-outline-variant' : 'text-secondary group-hover:scale-110 transition-transform'}`}>
+                      <span className={`material-symbols-outlined flex-shrink-0 ${ex.completed ? 'text-outline-variant' : 'text-secondary group-hover:scale-110 transition-transform'}`}>
                         fitness_center
                       </span>
                     </div>
