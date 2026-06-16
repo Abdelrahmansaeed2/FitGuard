@@ -60,9 +60,9 @@ export default function ActiveChallenge() {
           <div className="grid grid-cols-12 gap-6">
             
             {/* Progress Overview Card (Spans 8 cols) */}
-            <div className="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+            <div className="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 shadow-sm w-full">
               {/* Circular Progress */}
-              <div className="relative w-48 h-48 flex-shrink-0">
+              <div className="relative w-40 h-40 md:w-48 md:h-48 flex-shrink-0 mx-auto md:mx-0">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                   {/* Background Circle */}
                   <path className="text-surface-container-highest stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeWidth="3"></path>
@@ -76,28 +76,28 @@ export default function ActiveChallenge() {
               </div>
               
               {/* Stats & Streak */}
-              <div className="flex-1 space-y-6">
+              <div className="flex-1 space-y-6 w-full">
                 <div>
                   <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2">Phase {Math.ceil(currentDay / 10)}: {Math.ceil(currentDay / 10) === 1 ? 'Foundation' : Math.ceil(currentDay / 10) === 2 ? 'Adaptation' : 'Mastery'}</h3>
                   <p className="font-body-md text-body-md text-on-surface-variant">You are maintaining a strong recovery baseline. Biometric strain is optimal for current workload.</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex-shrink-0 flex items-center justify-center text-tertiary">
-                      <span className="material-symbols-outlined">local_fire_department</span>
+                <div className="flex flex-col sm:flex-row gap-4 w-full">
+                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex flex-col min-[400px]:flex-row items-center min-[400px]:items-start gap-3 text-center min-[400px]:text-left">
+                    <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex-shrink-0 flex items-center justify-center text-tertiary overflow-hidden">
+                      <span className="material-symbols-outlined text-[20px] sm:text-[24px] leading-none whitespace-nowrap">local_fire_department</span>
                     </div>
-                    <div>
-                      <p className="font-label-md text-label-md text-on-surface-variant">Current Streak</p>
-                      <p className="font-headline-md text-headline-md text-on-surface">{completedDaysCount} Days</p>
+                    <div className="flex-1 overflow-hidden w-full">
+                      <p className="font-label-md text-label-md text-on-surface-variant truncate">Current Streak</p>
+                      <p className="font-headline-md text-headline-md text-on-surface truncate">{completedDaysCount} Days</p>
                     </div>
                   </div>
-                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-container/20 flex-shrink-0 flex items-center justify-center text-primary">
-                      <span className="material-symbols-outlined">task_alt</span>
+                  <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex flex-col min-[400px]:flex-row items-center min-[400px]:items-start gap-3 text-center min-[400px]:text-left">
+                    <div className="w-10 h-10 rounded-full bg-primary-container/20 flex-shrink-0 flex items-center justify-center text-primary overflow-hidden">
+                      <span className="material-symbols-outlined text-[20px] sm:text-[24px] leading-none whitespace-nowrap">task_alt</span>
                     </div>
-                    <div>
-                      <p className="font-label-md text-label-md text-on-surface-variant">Completion Rate</p>
-                      <p className="font-headline-md text-headline-md text-on-surface">{progressPercentage}%</p>
+                    <div className="flex-1 overflow-hidden w-full">
+                      <p className="font-label-md text-label-md text-on-surface-variant truncate">Completion Rate</p>
+                      <p className="font-headline-md text-headline-md text-on-surface truncate">{progressPercentage}%</p>
                     </div>
                   </div>
                 </div>
@@ -106,13 +106,13 @@ export default function ActiveChallenge() {
 
             {/* Today's Task Card (Spans 4 cols) */}
             <div className="col-span-12 lg:col-span-4 bg-secondary-fixed text-on-secondary-fixed rounded-2xl p-6 flex flex-col shadow-sm border border-secondary-fixed-dim">
-              <div className="flex justify-between items-start mb-6">
-                <div>
+              <div className="flex justify-between items-start gap-4 mb-6">
+                <div className="flex-1">
                   <span className="inline-block px-3 py-1 bg-on-secondary-fixed text-secondary-fixed font-label-md text-label-md rounded-full mb-3">Day {currentDay}</span>
-                  <h3 className="font-headline-md text-headline-md mb-1">{planForToday?.task || 'Rest Day'}</h3>
+                  <h3 className="font-headline-md text-headline-md mb-1 break-words">{planForToday?.task || 'Rest Day'}</h3>
                   <p className="font-body-sm text-body-sm opacity-80">Difficulty: {planForToday?.difficulty}</p>
                 </div>
-                <span className="material-symbols-outlined text-[32px] opacity-50">fitness_center</span>
+                <span className="material-symbols-outlined text-[32px] opacity-50 flex-shrink-0 overflow-hidden whitespace-nowrap">fitness_center</span>
               </div>
               <div className="mt-auto space-y-4">
                 <div className="flex items-center gap-3 text-sm">
@@ -136,7 +136,7 @@ export default function ActiveChallenge() {
                 </div>
               </div>
               {/* Grid */}
-              <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
+              <div className="grid grid-cols-5 md:grid-cols-10 gap-2 sm:gap-3">
                 {activeChallenge.generatedPlan.map((dayObj, index) => {
                   const isCompleted = dayObj.completed;
                   const isToday = !isCompleted && currentDay === dayObj.day;
@@ -235,7 +235,7 @@ export default function ActiveChallenge() {
               {/* Daily Progress Ring Card */}
               <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
                 <h3 className="font-headline-sm text-headline-sm text-on-surface w-full text-left mb-4">Readiness Impact</h3>
-                <div className="relative w-48 h-48 flex items-center justify-center">
+                <div className="relative w-40 h-40 md:w-48 md:h-48 flex items-center justify-center">
                   {/* SVG Progress Ring */}
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle className="text-surface-container-high stroke-current" cx="50" cy="50" fill="transparent" r="40" strokeWidth="8"></circle>
@@ -267,13 +267,13 @@ export default function ActiveChallenge() {
                   <a className="font-label-md text-label-md text-primary hover:underline" href="#">View All</a>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-surface-container flex flex-col items-center p-4 rounded-lg border border-outline-variant">
-                    <span className="material-symbols-outlined text-4xl text-secondary mb-2" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
-                    <span className="font-label-md text-label-md text-on-surface text-center">7 Day Warrior</span>
+                  <div className="bg-surface-container flex flex-col items-center justify-center p-4 rounded-lg border border-outline-variant text-center overflow-hidden">
+                    <span className="material-symbols-outlined text-[32px] md:text-[36px] text-secondary mb-2 whitespace-nowrap" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+                    <span className="font-label-md text-label-md text-on-surface truncate w-full">7 Day Warrior</span>
                   </div>
-                  <div className="bg-surface-container flex flex-col items-center p-4 rounded-lg border border-outline-variant opacity-50 grayscale">
-                    <span className="material-symbols-outlined text-4xl text-outline mb-2">military_tech</span>
-                    <span className="font-label-md text-label-md text-on-surface text-center">21 Day Elite</span>
+                  <div className="bg-surface-container flex flex-col items-center justify-center p-4 rounded-lg border border-outline-variant opacity-50 grayscale text-center overflow-hidden">
+                    <span className="material-symbols-outlined text-[32px] md:text-[36px] text-outline mb-2 whitespace-nowrap">military_tech</span>
+                    <span className="font-label-md text-label-md text-on-surface truncate w-full">21 Day Elite</span>
                   </div>
                 </div>
               </div>
