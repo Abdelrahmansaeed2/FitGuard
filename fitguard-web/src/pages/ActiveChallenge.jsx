@@ -41,16 +41,16 @@ export default function ActiveChallenge() {
       {view === 'dashboard' ? (
         <div className="max-w-container-max mx-auto space-y-8">
           {/* Header Section */}
-          <div className="flex justify-between items-end mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
             <div>
               <p className="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">AI Program Active</p>
               <h2 className="font-display-md text-display-md text-on-surface">30-Day Resilience Challenge</h2>
             </div>
-            <div className="flex gap-4">
-              <button onClick={() => setShowAbandonModal(true)} className="px-6 py-2 border border-error text-error font-label-md text-label-md rounded-full hover:bg-error-container transition-colors">
+            <div className="flex flex-wrap gap-4 w-full md:w-auto">
+              <button onClick={() => setShowAbandonModal(true)} className="flex-1 md:flex-none px-6 py-2 border border-error text-error font-label-md text-label-md rounded-full hover:bg-error-container transition-colors text-center">
                 Abandon
               </button>
-              <Link to={`/challenges/${activeChallenge.id || activeChallenge._id}`} className="px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-full hover:bg-surface-container-low transition-colors">
+              <Link to={`/challenges/${activeChallenge.id || activeChallenge._id}`} className="flex-1 md:flex-none px-6 py-2 border border-outline-variant text-on-surface font-label-md text-label-md rounded-full hover:bg-surface-container-low transition-colors text-center">
                 View Guidelines
               </Link>
             </div>
@@ -81,9 +81,9 @@ export default function ActiveChallenge() {
                   <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2">Phase {Math.ceil(currentDay / 10)}: {Math.ceil(currentDay / 10) === 1 ? 'Foundation' : Math.ceil(currentDay / 10) === 2 ? 'Adaptation' : 'Mastery'}</h3>
                   <p className="font-body-md text-body-md text-on-surface-variant">You are maintaining a strong recovery baseline. Biometric strain is optimal for current workload.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+                    <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex-shrink-0 flex items-center justify-center text-tertiary">
                       <span className="material-symbols-outlined">local_fire_department</span>
                     </div>
                     <div>
@@ -92,7 +92,7 @@ export default function ActiveChallenge() {
                     </div>
                   </div>
                   <div className="bg-surface p-4 rounded-xl border border-outline-variant flex-1 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+                    <div className="w-10 h-10 rounded-full bg-primary-container/20 flex-shrink-0 flex items-center justify-center text-primary">
                       <span className="material-symbols-outlined">task_alt</span>
                     </div>
                     <div>
@@ -127,12 +127,12 @@ export default function ActiveChallenge() {
 
             {/* 30-Day Grid (Spans 12 cols) */}
             <div className="col-span-12 bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 shadow-sm">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">Journey Map</h3>
-                <div className="flex gap-4 font-label-md text-label-md text-on-surface-variant">
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-primary"></div> Completed</div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-secondary-container"></div> Today</div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-surface-container-highest"></div> Locked</div>
+                <div className="flex flex-wrap gap-4 font-label-md text-label-md text-on-surface-variant">
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-primary flex-shrink-0"></div> Completed</div>
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-secondary-container flex-shrink-0"></div> Today</div>
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-surface-container-highest flex-shrink-0"></div> Locked</div>
                 </div>
               </div>
               {/* Grid */}
@@ -168,7 +168,7 @@ export default function ActiveChallenge() {
               <h1 className="font-display-md text-display-md text-on-surface">Daily Challenge</h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant mt-1">Day {currentDay} of {totalDays}: {Math.ceil(currentDay / 10) === 1 ? 'Foundation' : Math.ceil(currentDay / 10) === 2 ? 'Adaptation' : 'Mastery'} Phase</p>
             </div>
-            <div className="flex items-center space-x-3 bg-secondary-container bg-opacity-10 px-4 py-2 rounded-full border border-secondary-container/20">
+            <div className="flex items-center w-full md:w-auto justify-center md:justify-start space-x-3 bg-secondary-container bg-opacity-10 px-4 py-2 rounded-full border border-secondary-container/20">
               <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
               <span className="font-mono-data text-mono-data text-secondary">{completedDaysCount} Day Streak</span>
             </div>
@@ -181,7 +181,7 @@ export default function ActiveChallenge() {
             <div className="lg:col-span-8 space-y-6">
               {/* Today's Tasks Card */}
               <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                   <h3 className="font-headline-md text-headline-md text-on-surface">Today's Protocol</h3>
                   <span className="bg-primary-container text-on-primary-container font-label-md text-label-md px-3 py-1 rounded-full">{completedExercisesCount}/{totalExercises} Completed</span>
                 </div>
