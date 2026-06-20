@@ -1,0 +1,45 @@
+services:
+  database:
+    image: mongo:latest
+    container_name: fitguard_database
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./fitguard-core
+      dockerfile: Dockerfile
+    container_name: fitguard_backend
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - MONGO_URI=mongodb://database:27017/fitguard
+      - FRONTEND_URL=http://localhost:3000
+    env_file:
+      - ./fitguard-core/.env
+    depends_on:
+      - database
+    volumes:
+      - ./fitguard-core:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./fitguard-web
+      dockerfile: Dockerfile
+    container_name: fitguard_frontend
+    ports:
+      - "3000:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5001/api
+    depends_on:
+      - backend
+    volumes:
+      - ./fitguard-web:/app
+      - /app/node_modules
+
+volumes:
+  mongo_data:
